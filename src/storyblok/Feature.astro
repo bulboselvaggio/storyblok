@@ -8,6 +8,7 @@ const { blok } = Astro.props
   {...storyblokEditable(blok)}
   class="w-full bg-[#f7f6fd] rounded-[5px] text-center overflow-hidden"
 >
+  <a href={blok.link.url} target="_blank" rel="noopener noreferrer">
   <img
     src={blok.image.filename}
     alt={blok.image.alt}

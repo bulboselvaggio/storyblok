@@ -1,0 +1,16 @@
+[
+  {
+    "id": "SKU-0001",
+    "name": "Standard Tee",
+    "price": 15.99,
+    "description": "Every day basic t-shirt",
+    "image": "https://a.storyblok.com/f/297215/2000x2000/679cbad1d5/anitatshirtfinished.jpg"
+  },
+  {
+    "id": "SKU-0002",
+    "name": "Hoodie",
+    "price": 29.99,
+    "description": "Comfortable hoodie for all seasons",
+    "image": "https://example.com/hoodie.jpg"
+  }
+]

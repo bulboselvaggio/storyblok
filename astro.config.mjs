@@ -19,10 +19,11 @@ export default defineConfig({
       },
       components: {
         page: 'storyblok/Page',
+        config: 'storyblok/Config',
         feature: 'storyblok/Feature',
         grid: 'storyblok/Grid',
         teaser: 'storyblok/Teaser',
-        hero: 'storyblok/Hero',
+        hero: 'storyblok/Hero',        
       },
     }),
     tailwind(),

@@ -19,6 +19,7 @@ export default defineConfig({
       },
       components: {
         page: 'storyblok/Page',
+        product: 'components/Product',
         config: 'storyblok/Config',
         feature: 'storyblok/Feature',
         grid: 'storyblok/Grid',

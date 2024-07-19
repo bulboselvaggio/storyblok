@@ -1,0 +1,29 @@
+---
+import ProductCard from '../components/ProductCard.astro'
+import { storyblokEditable } from '@storyblok/astro'
+
+const { blok } = Astro.props
+let products = blok.products || []
+---
+<section class="mx-6 my-12" {...storyblokEditable(blok)}>
+  <h2 class="text-6xl text-[#50b0ae] font-bold text-center mb-12">
+    {blok.headline}
+  </h2>
+  <ul class="grid grid-cols-1 gap-6 md:grid-cols-3">
+    {
+      products.length > 0 ? (
+        products.map((product) => {
+          // Assicurati che il campo `slug` sia presente
+          product.content.slug = product.slug
+          return (
+            <li key={product.content.slug}> {/* Usa il `slug` come chiave unica */}
+              <ProductCard product={product.content} />
+            </li>
+          )
+        })
+      ) : (
+        <li>No products available</li>
+      )
+    }
+  </ul>
+</section>

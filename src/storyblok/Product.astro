@@ -1,0 +1,23 @@
+---
+import { storyblokEditable } from '@storyblok/astro'
+
+const { blok } = Astro.props
+---
+
+<div {...storyblokEditable(blok)}>
+  <img src={blok.image.filename} alt={blok.name} />
+  <h1>{blok.name}</h1>
+  <p>{blok.description}</p>
+  <p>${blok.price}</p>
+  <button 
+    class="snipcart-add-item"
+    data-item-id={blok.id}
+    data-item-name={blok.name}
+    data-item-price={blok.price}
+    data-item-url={`/products/${blok.slug}`}
+    data-item-image={blok.image.filename}
+    data-item-description={blok.description}
+  >
+    Buy Now    
+  </button>
+</div>

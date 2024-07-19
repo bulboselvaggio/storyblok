@@ -94,26 +94,6 @@ import products from '../data/products.json';
   </head>
   <body class='container mx-auto'>
     <Header />
-
-<!-- Mostra il prodotto (la t-shirt) -->
-<div class="product">
-  <h2>{products[0].name}</h2>
-  <img src={products[0].image} alt={products[0].name} />
-  <p>{products[0].description}</p>
-  <span>{`${products[0].price}€`}</span>
-  <button
-    class="snipcart-add-item"
-    data-item-id={products[0].id}
-    data-item-name={products[0].name}
-    data-item-url="/"
-    data-item-price={products[0].price}
-    data-item-image={products[0].image}
-    data-item-description={products[0].description}
-  >
-    Add to cart
-  </button>
-</div>
-
     <slot />    
   </body>
 </html>

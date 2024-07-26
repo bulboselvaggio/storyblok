@@ -4,20 +4,328 @@ import { storyblokEditable } from '@storyblok/astro'
 const { blok } = Astro.props
 ---
 
-<div {...storyblokEditable(blok)}>
-  <img src={blok.image.filename} alt={blok.name} />
-  <h1>{blok.name}</h1>
-  <p>{blok.description}</p>
-  <p>${blok.price}</p>
-  <button 
-    class="snipcart-add-item"
-    data-item-id={blok.id}
-    data-item-name={blok.name}
-    data-item-price={blok.price}
-    data-item-url={`/products/${blok.slug}`}
-    data-item-image={blok.image.filename}
-    data-item-description={blok.description}
-  >
-    Buy Now    
-  </button>
+<div {...storyblokEditable(blok)} class="product-container">
+
+  <!-- Contenitore principale per l'immagine e i dettagli del prodotto -->
+  <div class="product-main">
+    <!-- Immagine principale -->
+    <div class="main-image">
+      <img id="main-image" src={blok.image.filename} alt={blok.name} />
+    </div>
+
+      <!-- Thumbnails -->
+  <div class="thumbs">
+    {blok.thumbnails?.map(thumbnail => (
+      <img 
+        src={thumbnail.filename}
+        alt={blok.name}
+        class="thumb"
+        data-fullsize={thumbnail.filename}
+      />
+    ))}
+  </div>
+
+    <!-- Dati del prodotto -->
+    <div class="product-details">
+      <h1>{blok.name}</h1>
+      <p>{blok.description}</p>
+      <p>${blok.price}</p>
+
+      <!-- Selezione della taglia -->
+      <div class="size-selection">
+        {blok.sizes?.map(size => (
+          <input
+            type="radio"
+            id={`size-${size}`}
+            name="size"
+            value={size}
+            class="size-input"
+            data-size={size}
+          />
+          <label for={`size-${size}`} class="size-button" data-size={size}>
+            {size}
+          </label>
+        ))}
+      </div>
+
+      <!-- Pulsante Add to Cart -->
+      <button 
+        class="snipcart-add-item" 
+        data-item-id={blok.id}
+        data-item-name={blok.name}
+        data-item-price={blok.price}
+        data-item-url={`/products/${blok.slug}`}
+        data-item-image={blok.image.filename}
+        data-item-description={blok.description}
+        data-item-custom1-name="Size"
+        data-item-custom1-options={blok.sizes?.join('|')}
+        data-item-custom1-value=""
+        disabled
+      >
+        Buy Now
+      </button>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="close">&times;</span>
+    <img class="lightbox-content" id="lightbox-image" />
+    <div id="caption"></div>
+  </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded and parsed');
+
+    // Gestione delle miniature
+    const thumbs = document.querySelectorAll('.thumb');
+    thumbs.forEach(thumb => {
+      thumb.addEventListener('click', function() {
+        const fullsizeSrc = this.getAttribute('data-fullsize');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const caption = document.getElementById('caption');
+
+        lightbox.style.display = 'block';
+        lightboxImage.src = fullsizeSrc;
+        caption.innerHTML = this.alt;
+      });
+    });
+
+    // Gestione della chiusura del lightbox
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    window.closeLightbox = closeLightbox;
+
+    // Gestione della selezione della taglia
+    const sizeInputs = document.querySelectorAll('.size-input');
+    const addButton = document.querySelector('.snipcart-add-item');
+
+    sizeInputs.forEach(input => {
+      input.addEventListener('change', () => {
+        const selectedSize = document.querySelector('.size-input:checked');
+        if (selectedSize) {
+          const selectedSizeValue = selectedSize.dataset.size;
+          addButton.disabled = false;
+          addButton.setAttribute('data-item-custom1-value', selectedSizeValue);
+
+
+          // Reset style per il pulsante
+          addButton.style.backgroundColor = '';
+          addButton.style.color = '';
+
+          // Applica lo stile della taglia selezionata al pulsante
+          const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`);
+          if (selectedSizeButton) {
+            const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
+            const color = getComputedStyle(selectedSizeButton).color;
+            console.log('Applying styles:', backgroundColor, color);
+            addButton.style.backgroundColor = backgroundColor;
+            addButton.style.color = color;
+          }
+        } else {
+          addButton.disabled = true;
+          addButton.style.backgroundColor = '#ccc'; // Colore disabilitato
+          addButton.style.color = '#666'; // Colore testo disabilitato
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+/* Contenitore principale per la pagina del prodotto */
+.product-container {
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Contenitore per l'immagine e i dettagli del prodotto */
+.product-main {
+  display: flex;
+  flex-direction: column; /* Imposta la disposizione predefinita per mobile */
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Contenitore per l'immagine principale e i dettagli del prodotto per desktop */
+.product-main-content {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Stili per l'immagine principale */
+.main-image {
+  flex: 1;
+}
+
+.main-image img {
+  width: 100%;
+  max-width: 500px;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+/* Stili per i dettagli del prodotto */
+.product-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Layout dei dettagli del prodotto */
+.product-details h1 {
+  margin: 0 0 10px;
+}
+
+.product-details p {
+  margin: 5px 0;
+}
+
+.size-selection {
+  margin: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.size-input {
+  display: none; /* Nascondi i radio button */
+}
+
+.size-button {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+  display: inline-block;
+  background-color: #f9f9f9;
+}
+
+.size-button:hover {
+  background-color: #e0e0e0; /* Cambia colore di hover */
+}
+
+.size-input:checked + .size-button {
+  background-color: #50b0ae; /* Cambia colore se selezionato */
+  color: white;
+}
+
+.snipcart-add-item:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.snipcart-add-item {
+  cursor: pointer;
+  margin-top: 10px; /* Spazio sopra il pulsante */
+}
+
+/* Thumbnails */
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px; /* Spazio sopra i thumbnail */
+  flex-wrap: wrap; /* Permette ai thumbnail di andare a capo */
+}
+
+/* Gestisci larghezza dei thumbnail su dispositivi mobili */
+.thumb {
+  width: 100px; /* Adatta la larghezza dei thumbnail per i dispositivi mobili */
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.thumb:hover {
+  opacity: 0.7;
+}
+
+/* Lightbox */
+.lightbox {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.lightbox-content {
+  margin: auto;
+  display: block;
+  max-width: 90%;
+  max-height: 80vh;
+}
+
+.lightbox .close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox .close:hover {
+  color: #bbb;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+#caption {
+  text-align: center;
+  padding: 10px;
+  color: #fff;
+}
+
+/* Media queries */
+@media (min-width: 769px) {
+  .product-main {
+    flex-direction: column; /* Mantiene la disposizione per mobile */
+  }
+
+  .product-main-content {
+    flex-direction: row; /* Disposizione in riga per desktop */
+  }
+
+  .product-details {
+    flex: 1; /* Occupa spazio rimanente accanto all'immagine */
+  }
+}
+
+@media (max-width: 768px) {
+  .product-main-content {
+    display: none; /* Nasconde la sezione principale del layout per mobile */
+  }
+
+  .thumbs {
+    width: 100%; /* Occupa tutta la larghezza disponibile */
+    overflow-x: auto; /* Permette lo scroll orizzontale se necessario */
+    margin-top: 10px; /* Spazio sopra i thumbnail */
+  }
+
+  .thumb {
+    width: 80px; /* Adatta la larghezza dei thumbnail per i dispositivi mobili */
+  }
+}
+
+
+</style>
+

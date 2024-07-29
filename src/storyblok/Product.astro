@@ -7,50 +7,55 @@ const { blok } = Astro.props
 <div {...storyblokEditable(blok)} class="product-container">
 
   <!-- Contenitore principale per l'immagine e i dettagli del prodotto -->
-  <div class="product-main">
-    <!-- Immagine principale -->
-    <div class="main-image">
-      <img id="main-image" src={blok.image.filename} alt={blok.name} />
-    </div>
+  <div class="product-main grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <!-- Colonna dell'immagine principale e dei thumbnails -->
+    <div>
+      <!-- Immagine principale -->
+      <div class="main-image">
+        <img id="main-image" src={blok.image.filename} alt={blok.name} class="w-full object-cover" />
+      </div>
 
       <!-- Thumbnails -->
-  <div class="thumbs">
-    {blok.thumbnails?.map(thumbnail => (
-      <img 
-        src={thumbnail.filename}
-        alt={blok.name}
-        class="thumb"
-        data-fullsize={thumbnail.filename}
-      />
-    ))}
-  </div>
+      <div class="thumbs flex space-x-2 mt-4">
+        {blok.thumbnails?.map(thumbnail => (
+          <img 
+            src={thumbnail.filename}
+            alt={blok.name}
+            class="thumb w-20 cursor-pointer transition-opacity duration-300 hover:opacity-70" 
+            data-fullsize={thumbnail.filename}
+          />
+        ))}
+      </div>
+    </div>
 
-    <!-- Dati del prodotto -->
-    <div class="product-details">
-      <h1>{blok.name}</h1>
+    <!-- Colonna dei dettagli del prodotto -->
+    <div class="product-details flex flex-col space-y-4">
+      <h1 class="text-2xl font-bold tracking-tight">{blok.name}</h1>
       <p>{blok.description}</p>
-      <p>${blok.price}</p>
+      <p class="text-xl font-semibold">${blok.price}</p>
 
       <!-- Selezione della taglia -->
-      <div class="size-selection">
+      <div class="size-selection flex flex-wrap gap-2">
         {blok.sizes?.map(size => (
-          <input
-            type="radio"
-            id={`size-${size}`}
-            name="size"
-            value={size}
-            class="size-input"
-            data-size={size}
-          />
-          <label for={`size-${size}`} class="size-button" data-size={size}>
-            {size}
-          </label>
+          <div>
+            <input
+              type="radio"
+              id={`size-${size}`}
+              name="size"
+              value={size}
+              class="size-input hidden"
+              data-size={size}
+            />
+            <label for={`size-${size}`} class="size-button border px-4 py-2 cursor-pointer bg-gray-100" data-size={size}>
+              {size}
+            </label>
+          </div>
         ))}
       </div>
 
       <!-- Pulsante Add to Cart -->
       <button 
-        class="snipcart-add-item" 
+        class="snipcart-add-item bg-blue-500 text-white px-4 py-2 cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed" 
         data-item-id={blok.id}
         data-item-name={blok.name}
         data-item-price={blok.price}
@@ -74,6 +79,7 @@ const { blok } = Astro.props
     <div id="caption"></div>
   </div>
 </div>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM fully loaded and parsed');
@@ -112,7 +118,6 @@ const { blok } = Astro.props
           addButton.disabled = false;
           addButton.setAttribute('data-item-custom1-value', selectedSizeValue);
 
-
           // Reset style per il pulsante
           addButton.style.backgroundColor = '';
           addButton.style.color = '';
@@ -144,26 +149,20 @@ const { blok } = Astro.props
   max-width: 1200px;
 }
 
-/* Contenitore per l'immagine e i dettagli del prodotto */
+/* Layout della griglia per la pagina del prodotto */
 .product-main {
-  display: flex;
-  flex-direction: column; /* Imposta la disposizione predefinita per mobile */
+  display: grid;
+  grid-template-columns: 1fr; /* Una colonna per mobile */
   gap: 20px;
-  margin-bottom: 20px;
 }
 
-/* Contenitore per l'immagine principale e i dettagli del prodotto per desktop */
-.product-main-content {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
+@media (min-width: 1024px) {
+  .product-main {
+    grid-template-columns: 1fr 1fr; /* Due colonne per desktop */
+  }
 }
 
 /* Stili per l'immagine principale */
-.main-image {
-  flex: 1;
-}
-
 .main-image img {
   width: 100%;
   max-width: 500px;
@@ -171,72 +170,15 @@ const { blok } = Astro.props
   object-fit: cover;
 }
 
-/* Stili per i dettagli del prodotto */
-.product-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* Layout dei dettagli del prodotto */
-.product-details h1 {
-  margin: 0 0 10px;
-}
-
-.product-details p {
-  margin: 5px 0;
-}
-
-.size-selection {
-  margin: 10px 0;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.size-input {
-  display: none; /* Nascondi i radio button */
-}
-
-.size-button {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 5px;
-  cursor: pointer;
-  display: inline-block;
-  background-color: #f9f9f9;
-}
-
-.size-button:hover {
-  background-color: #e0e0e0; /* Cambia colore di hover */
-}
-
-.size-input:checked + .size-button {
-  background-color: #50b0ae; /* Cambia colore se selezionato */
-  color: white;
-}
-
-.snipcart-add-item:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.snipcart-add-item {
-  cursor: pointer;
-  margin-top: 10px; /* Spazio sopra il pulsante */
-}
-
 /* Thumbnails */
 .thumbs {
   display: flex;
   gap: 10px;
-  margin-top: 20px; /* Spazio sopra i thumbnail */
-  flex-wrap: wrap; /* Permette ai thumbnail di andare a capo */
+  margin-top: 20px;
 }
 
-/* Gestisci larghezza dei thumbnail su dispositivi mobili */
 .thumb {
-  width: 100px; /* Adatta la larghezza dei thumbnail per i dispositivi mobili */
+  width: 100px;
   cursor: pointer;
   transition: opacity 0.3s;
 }
@@ -295,37 +237,55 @@ const { blok } = Astro.props
   color: #fff;
 }
 
-/* Media queries */
-@media (min-width: 769px) {
-  .product-main {
-    flex-direction: column; /* Mantiene la disposizione per mobile */
-  }
-
-  .product-main-content {
-    flex-direction: row; /* Disposizione in riga per desktop */
-  }
-
-  .product-details {
-    flex: 1; /* Occupa spazio rimanente accanto all'immagine */
-  }
+/* Stili per i dettagli del prodotto */
+.product-details {
+  display: flex;
+  flex-direction: column;
 }
 
-@media (max-width: 768px) {
-  .product-main-content {
-    display: none; /* Nasconde la sezione principale del layout per mobile */
-  }
-
-  .thumbs {
-    width: 100%; /* Occupa tutta la larghezza disponibile */
-    overflow-x: auto; /* Permette lo scroll orizzontale se necessario */
-    margin-top: 10px; /* Spazio sopra i thumbnail */
-  }
-
-  .thumb {
-    width: 80px; /* Adatta la larghezza dei thumbnail per i dispositivi mobili */
-  }
+.product-details h1 {
+  margin: 0 0 10px;
 }
 
+.product-details p {
+  margin: 5px 0;
+}
 
+/* Selezione della taglia */
+.size-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.size-input {
+  display: none; /* Nascondi i radio button */
+}
+
+.size-button {
+  border: 1px solid #ccc;
+  padding: 10px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
+
+.size-button:hover {
+  background-color: #e0e0e0;
+}
+
+.size-input:checked + .size-button {
+  background-color: #50b0ae;
+  color: white;
+}
+
+/* Pulsante Add to Cart */
+.snipcart-add-item {
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.snipcart-add-item:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 </style>
-

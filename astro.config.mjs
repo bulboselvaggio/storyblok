@@ -19,7 +19,6 @@ export default defineConfig({
       },
       components: {
         page: 'storyblok/Page',
-        product: 'components/Product',
         config: 'storyblok/Config',
         feature: 'storyblok/Feature',
         grid: 'storyblok/Grid',
@@ -31,6 +30,7 @@ export default defineConfig({
         'popular-products': 'storyblok/PopularProducts',
         'all-products': 'storyblok/AllProducts',
         product: 'storyblok/Product',
+        seo_meta: 'components/SeoMeta',
       },
     }),
     tailwind(),

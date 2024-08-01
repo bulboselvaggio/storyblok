@@ -2,6 +2,7 @@
 import { useStoryblokApi } from '@storyblok/astro'
 import StoryblokComponent from '@storyblok/astro/StoryblokComponent.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import seoDefaults from '../seoDefaults'
  
 export async function getStaticPaths() {
   const storyblokApi = useStoryblokApi()
@@ -19,9 +20,11 @@ export async function getStaticPaths() {
       }
     })
 }
- 
+
+// Recupera lo slug dalla URL 
 const { slug } = Astro.params
- 
+
+// Usa l'API di Storyblok per ottenere i dati 
 const storyblokApi = useStoryblokApi()
  
 const { data } = await storyblokApi.get(
@@ -32,9 +35,28 @@ const { data } = await storyblokApi.get(
   }
 )
  
+// Ottieni i dati della storia
 const story = data.story
+
+const seoTitle = story.content.seo_title || story.content.name || 'Comics and tees by Milfo';
+const seoDescription = story.content.seo_description || 'Discover the best comics and t-shirts designed by Milfo.';
+const seoKeywords = story.content.seo_keywords || 'comics, t-shirts, Milfo, art, design';
+const ogImage = story.content.seo_facebook_image?.filename || 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png';
+const twitterImage = story.content.seo_twitter_image?.filename || 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png';
+const pageUrl = slug === undefined ? 'https://milfo.it/' : `https://milfo.it/${slug}`;
+const canonicalUrl = slug === undefined ? 'https://milfo.it/' : `https://milfo.it/${slug}`;
+const ogType = 'website';
 ---
- 
-<BaseLayout>
+
+<BaseLayout 
+  pageTitle={seoTitle}
+  pageDescription={seoDescription}
+  pageKeywords={seoKeywords}
+  pageOgImage={ogImage}
+  pageTwitterImage={twitterImage}
+  pageUrl={pageUrl}
+  canonicalUrl={canonicalUrl}
+  ogType={ogType}
+>
   <StoryblokComponent blok={story.content} />
 </BaseLayout>

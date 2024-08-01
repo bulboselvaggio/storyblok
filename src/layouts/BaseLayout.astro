@@ -1,17 +1,43 @@
 ---
 // src/layouts/BaseLayout.astro
 import Header from '../components/Header.astro';
-import products from '../data/products.json';
+
+const { 
+  pageTitle = 'Comics and tees by Milfo',
+  pageDescription = 'Discover the best comics and t-shirts designed by Milfo.',
+  pageKeywords = 'comics, t-shirts, Milfo, art, design',
+  pageOgImage = 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png',
+  pageTwitterImage = 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png',
+  pageUrl = 'https://milfo.it/',
+  canonicalUrl = pageUrl,
+  ogType = 'website',
+} = Astro.props;
 ---
 
 <html lang='en'>
   <head>
     <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <link rel='icon' type='image/x-icon' href='/favicon.ico' />
-    <title>MILFO | Comics by Milfoski</title>
+    <title>{pageTitle}</title>
 
-    <!-- Inserisci qui il codice di configurazione di Snipcart -->
+    <meta name="description" content={pageDescription} />
+    <meta name="keywords" content={pageKeywords} />
+    
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:image" content={pageOgImage} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:type" content={ogType} />
+
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={pageTwitterImage} />
+    
+    <link rel="canonical" href={pageUrl} />
+  </head>
+
+
     <script>
       window.SnipcartSettings = {
         publicApiKey: "ZGM2ZmJkMzktNjUzYi00N2RhLTkwYmYtMTNjYjJlZGU3OTAxNjM4NTY4MDg0OTkxOTA5MDAz",
@@ -90,7 +116,7 @@ import products from '../data/products.json';
         }
       })();
     </script>
-    <!-- Fine del codice di configurazione di Snipcart -->
+
   </head>
   <body class='container mx-auto'>
     <Header />

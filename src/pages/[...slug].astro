@@ -38,18 +38,29 @@ const { data } = await storyblokApi.get(
 // Ottieni i dati della storia
 const story = data.story
 
-const seoTitle = story.content.seo_title || story.content.name || 'Comics and tees by Milfo';
-const seoDescription = story.content.seo_description || 'Discover the best comics and t-shirts designed by Milfo.';
-const seoKeywords = story.content.seo_keywords || 'comics, t-shirts, Milfo, art, design';
-const ogImage = story.content.seo_facebook_image?.filename || 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png';
-const twitterImage = story.content.seo_twitter_image?.filename || 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png';
-const pageUrl = slug === undefined ? 'https://milfo.it/' : `https://milfo.it/${slug}`;
-const canonicalUrl = slug === undefined ? 'https://milfo.it/' : `https://milfo.it/${slug}`;
-const ogType = 'website';
+// Determina se è una pagina
+const isPage = story.content.component === 'page'
+
+// Determina il titolo SEO
+const seoTitle = story.content.seo_title || (isPage ? story.name : (story.content.title || seoDefaults.title))
+
+// Formatta il titolo
+const formattedTitle = isPage && !story.content.seo_title && story.name && story.name !== seoDefaults.title 
+  ? `${story.name} | Milfoski` 
+  : seoTitle
+
+// Determina altre proprietà SEO
+const seoDescription = story.content.seo_description || seoDefaults.description
+const seoKeywords = story.content.seo_keywords || seoDefaults.keywords
+const ogImage = story.content.seo_facebook_image?.filename || seoDefaults.ogImage
+const twitterImage = story.content.seo_twitter_image?.filename || seoDefaults.twitterImage
+const pageUrl = slug === undefined ? seoDefaults.url : `${seoDefaults.url}/${slug}`
+const canonicalUrl = slug === undefined ? seoDefaults.url : `${seoDefaults.url}/${slug}`
+const ogType = seoDefaults.ogType
 ---
 
 <BaseLayout 
-  pageTitle={seoTitle}
+  pageTitle={formattedTitle}
   pageDescription={seoDescription}
   pageKeywords={seoKeywords}
   pageOgImage={ogImage}

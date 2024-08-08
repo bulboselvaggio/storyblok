@@ -8,11 +8,11 @@ const { product } = Astro.props
     <img
       class="object-cover object-center w-full lg:h-48 md:h-36 rounded"
       src={`${product.image.filename}/m/360x240`}
-      alt={product.name}
+      alt={product.title}
     />
     <div class="p-4">
       <h1 class="text-2xl font-semibold lg:text-3xl">
-        {product.name}
+        {product.title}
       </h1>
       <p class="leading-relaxed text-gray-700 my-4">
         ${product.price}

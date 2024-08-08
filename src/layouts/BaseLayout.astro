@@ -2,16 +2,21 @@
 // src/layouts/BaseLayout.astro
 import Header from '../components/Header.astro';
 
+import seoDefaults from '../seoDefaults'
+
 const { 
-  pageTitle = 'Comics and tees by Milfo',
-  pageDescription = 'Discover the best comics and t-shirts designed by Milfo.',
-  pageKeywords = 'comics, t-shirts, Milfo, art, design',
-  pageOgImage = 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png',
-  pageTwitterImage = 'https://a.storyblok.com/f/297215/1280x628/60abf16c8e/milfoski-sharing.png',
-  pageUrl = 'https://milfo.it/',
-  canonicalUrl = pageUrl,
+  pageTitle = '',
+  pageDescription = '',
+  pageKeywords = '',
+  pageOgImage = '',
+  pageTwitterImage = '',
+  pageUrl = '',
   ogType = 'website',
+  canonicalUrl = '',
 } = Astro.props;
+
+// Aggiungi "| Milfoski" solo se pageTitle è vuoto e non è il fallback di default
+const formattedTitle = pageTitle ? `${pageTitle}` : 'Milfoski';
 ---
 
 <html lang='en'>
@@ -19,24 +24,23 @@ const {
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <link rel='icon' type='image/x-icon' href='/favicon.ico' />
-    <title>{pageTitle}</title>
+    <title>{formattedTitle}</title>
 
     <meta name="description" content={pageDescription} />
     <meta name="keywords" content={pageKeywords} />
     
-    <meta property="og:title" content={pageTitle} />
+    <meta property="og:title" content={formattedTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:image" content={pageOgImage} />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:type" content={ogType} />
 
-    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:title" content={formattedTitle} />
     <meta name="twitter:description" content={pageDescription} />
     <meta name="twitter:image" content={pageTwitterImage} />
     
-    <link rel="canonical" href={pageUrl} />
+    <link rel="canonical" href={canonicalUrl} />
   </head>
-
 
     <script>
       window.SnipcartSettings = {

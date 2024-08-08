@@ -57,7 +57,7 @@ const { blok } = Astro.props
       <button 
         class="snipcart-add-item bg-blue-500 text-white px-4 py-2 cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed" 
         data-item-id={blok.id}
-        data-item-name={blok.name}
+        data-item-name={blok.title}
         data-item-price={blok.price}
         data-item-url={`/products/${blok.slug}`}
         data-item-image={blok.image.filename}

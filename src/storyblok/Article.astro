@@ -8,151 +8,98 @@ function sortImagesByFilename(images) {
   return images.sort((a, b) => {
     const numA = parseInt(a.filename.match(/(\d+)/)?.[0], 10);
     const numB = parseInt(b.filename.match(/(\d+)/)?.[0], 10);
-
-    // Se entrambi i nomi dei file contengono numeri, ordina per numero
-    if (!isNaN(numA) && !isNaN(numB)) {
-      return numA - numB;
-    }
-
-    // Se solo uno dei due file ha un numero, quello senza numero va dopo
-    if (!isNaN(numA)) return -1;
-    if (!isNaN(numB)) return 1;
-
-    // Se nessuno ha un numero, mantieni l'ordine originale
-    return 0;
+    return numA - numB;
   });
 }
 
-// Ordina le immagini se esistono
+// Funzione per estrarre larghezza e altezza dall'URL
+function extractDimensionsFromURL(url) {
+  const dimensionString = url.split('/')[5];
+  const dimensions = dimensionString.split('x');
+  return {
+    width: dimensions[0],
+    height: dimensions[1]
+  };
+}
+
 const sortedImages = Array.isArray(blok.images) && blok.images.length > 0 
   ? sortImagesByFilename(blok.images)
   : [];
 ---
 
+<style>
+  /* Stili per il lightbox */
+  .pswp img {
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+    margin: auto;
+  }
+</style>
+
 <article {...storyblokEditable(blok)} class="flex flex-col items-center my-12">
   <h1 class="text-center text-5xl font-bold mb-4">{blok.title}</h1>
   <p class="text-center text-xl text-gray-700 mb-8">{blok.teaser}</p>
 
-  <div class="space-y-8">
+  <!-- Galleria con layout Tailwind CSS -->
+  <div id="my-gallery" class="grid grid-cols-1 gap-8">
     {sortedImages.length > 0 ? (
       sortedImages.map((image, index) => {
-        // Determina l'alt del tag immagine
         const imageAlt = image.alt || blok.title || `Image ${index + 1}`;
+        const imageUrlBase = image.filename.split('/m/')[0];
+
+        // Estrai larghezza e altezza dall'URL dell'immagine
+        const { width, height } = extractDimensionsFromURL(image.filename);
 
         return (
-          <div key={index} class="relative">
-            <img 
-              src={`${image.filename}/m/1600x0`} 
-              alt={imageAlt} 
-              class="cursor-pointer w-full max-w-screen-md thumb"
-              data-fullsize={`${image.filename}/m/1600x0`}
-            />
+          <a
+            key={index}
+            href={`${imageUrlBase}/m/1600x0`}
+            data-pswp-width={width}
+            data-pswp-height={height}
+            class="relative gallery-item"
+          >
+            <picture>
+              <source
+                srcSet={`${imageUrlBase}/m/500x0/filters:format(avif)`}
+                type="image/avif"
+                media="(max-width: 768px)"
+              />
+              <source
+                srcSet={`${imageUrlBase}/m/500x0/filters:format(webp)`}
+                type="image/webp"
+                media="(max-width: 768px)"
+              />
+              <img 
+                src={`${imageUrlBase}/m/800x0`} 
+                alt={imageAlt}
+                class="cursor-pointer w-full max-w-screen-md thumb"
+              />
+            </picture>
             {image.title && (
               <p class="absolute bottom-2 left-0 right-0 text-center text-sm text-gray-500 bg-white bg-opacity-75 p-2">
                 {image.title}
               </p>
             )}
-          </div>
+          </a>
         );
       })
     ) : (
       <p>No images available.</p>
     )}
   </div>
-
-  <!-- Lightbox -->
-  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-    <span class="close">&times;</span>
-    <img class="lightbox-content" id="lightbox-image" />
-    <div id="caption"></div>
-  </div>
 </article>
 
 <script>
-  // Gestione delle miniature
-  const thumbs = document.querySelectorAll('.thumb');
-  thumbs.forEach(thumb => {
-    thumb.addEventListener('click', function() {
-      const fullsizeSrc = this.getAttribute('data-fullsize');
-      const lightbox = document.getElementById('lightbox');
-      const lightboxImage = document.getElementById('lightbox-image');
-      const caption = document.getElementById('caption');
+  import 'photoswipe/style.css';
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+  import PhotoSwipe from 'photoswipe';
 
-      lightbox.style.display = 'block';
-      lightboxImage.src = fullsizeSrc;
-      caption.innerHTML = this.alt;
-    });
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '#my-gallery',
+    children: 'a',
+    pswpModule: PhotoSwipe
   });
 
-  // Gestione della chiusura del lightbox
-  function closeLightbox() {
-    document.getElementById('lightbox').style.display = 'none';
-  }
-
-  window.closeLightbox = closeLightbox;
+  lightbox.init();
 </script>
-
-<style>
-  .lightbox {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    overflow: auto;
-  }
-
-  .lightbox-content {
-    margin: auto;
-    display: block;
-    max-width: 80%;
-    max-height: 80vh;
-  }
-
-  .lightbox .close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    color: #fff;
-    font-size: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .lightbox .close:hover {
-    color: #bbb;
-  }
-
-  #caption {
-    text-align: center;
-    color: #fff;
-    padding: 10px;
-  }
-
-  /* Stili per il titolo sotto l'immagine */
-  .relative {
-    position: relative;
-  }
-
-  .relative p {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(255, 255, 255, 0.75);
-    padding: 5px;
-    text-align: center;
-    font-size: 0.875rem; /* Small text */
-    color: #333;
-  }
-</style>

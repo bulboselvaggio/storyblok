@@ -81,62 +81,72 @@ const { blok } = Astro.props
 </div>
 
 <script>
-  // Gestione delle miniature
-  const thumbs = document.querySelectorAll('.thumb');
-  thumbs.forEach(thumb => {
-    thumb.addEventListener('click', function() {
-      const fullsizeSrc = this.getAttribute('data-fullsize');
-      const lightbox = document.getElementById('lightbox');
-      const lightboxImage = document.getElementById('lightbox-image');
-      const caption = document.getElementById('caption');
+  if (window.location.pathname.includes('/products/')) {
+    // Gestione delle miniature
+    const thumbs = document.querySelectorAll('.thumb');
+    thumbs.forEach(thumb => {
+      thumb.addEventListener('click', function() {
+        const fullsizeSrc = this.getAttribute('data-fullsize');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const caption = document.getElementById('caption');
 
-      lightbox.style.display = 'block';
-      lightboxImage.src = fullsizeSrc;
-      caption.innerHTML = this.alt;
-    });
-  });
-
-  // Gestione della chiusura del lightbox
-  function closeLightbox() {
-    document.getElementById('lightbox').style.display = 'none';
-  }
-
-  window.closeLightbox = closeLightbox;
-
-  // Gestione della selezione della taglia
-  const sizeInputs = document.querySelectorAll('.size-input');
-  const addButton = document.querySelector('.snipcart-add-item');
-
-  sizeInputs.forEach(input => {
-    input.addEventListener('change', () => {
-      const selectedSize = document.querySelector('.size-input:checked');
-      if (selectedSize) {
-        const selectedSizeValue = selectedSize.dataset.size;
-        addButton.disabled = false;
-        addButton.setAttribute('data-item-custom1-value', selectedSizeValue);
-
-        // Reset style per il pulsante
-        addButton.style.backgroundColor = '';
-        addButton.style.color = '';
-
-        // Applica lo stile della taglia selezionata al pulsante
-        const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`);
-        if (selectedSizeButton) {
-          const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
-          const color = getComputedStyle(selectedSizeButton).color;
-          console.log('Applying styles:', backgroundColor, color);
-          addButton.style.backgroundColor = backgroundColor;
-          addButton.style.color = color;
+        if (lightbox && lightboxImage && caption) {
+          lightbox.style.display = 'block';
+          lightboxImage.src = fullsizeSrc;
+          caption.innerHTML = this.alt || 'No caption available';
+        } else {
+          console.error('Elementi del lightbox mancanti.');
         }
-      } else {
-        addButton.disabled = true;
-        addButton.style.backgroundColor = '#ccc'; // Colore disabilitato
-        addButton.style.color = '#666'; // Colore testo disabilitato
-      }
+      });
     });
-  });
-</script>
 
+    // Gestione della chiusura del lightbox
+    function closeLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      if (lightbox) {
+        lightbox.style.display = 'none';
+      }
+    }
+
+    window.closeLightbox = closeLightbox;
+
+    // Gestione della selezione della taglia
+    const sizeInputs = document.querySelectorAll('.size-input');
+    const addButton = document.querySelector('.snipcart-add-item');
+
+    if (sizeInputs.length > 0 && addButton) {
+      sizeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+          const selectedSize = document.querySelector('.size-input:checked');
+          if (selectedSize) {
+            const selectedSizeValue = selectedSize.dataset.size;
+            addButton.disabled = false;
+            addButton.setAttribute('data-item-custom1-value', selectedSizeValue);
+
+            addButton.style.backgroundColor = '';
+            addButton.style.color = '';
+
+            const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`);
+            if (selectedSizeButton) {
+              const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
+              const color = getComputedStyle(selectedSizeButton).color;
+              console.log('Applying styles:', backgroundColor, color);
+              addButton.style.backgroundColor = backgroundColor;
+              addButton.style.color = color;
+            }
+          } else {
+            addButton.disabled = true;
+            addButton.style.backgroundColor = '#ccc';
+            addButton.style.color = '#666';
+          }
+        });
+      });
+    } else {
+      console.error('Selezione della taglia o pulsante non trovati.');
+    }
+  }
+</script>
 
 <style>
 /* Contenitore principale per la pagina del prodotto */

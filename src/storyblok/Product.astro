@@ -1,29 +1,51 @@
 ---
-import { storyblokEditable } from '@storyblok/astro'
+import { storyblokEditable } from '@storyblok/astro';
 
-const { blok } = Astro.props
+const { blok } = Astro.props;
+
+// Funzione per estrarre larghezza e altezza dall'URL
+function extractDimensionsFromURL(url) {
+  const dimensionString = url.split('/')[5];
+  const dimensions = dimensionString.split('x');
+  return {
+    width: dimensions[0],
+    height: dimensions[1]
+  };
+}
 ---
 
 <div {...storyblokEditable(blok)} class="product-container">
 
   <!-- Contenitore principale per l'immagine e i dettagli del prodotto -->
   <div class="product-main grid grid-cols-1 lg:grid-cols-2 gap-10">
-    <!-- Colonna dell'immagine principale e dei thumbnails -->
+    <!-- Colonna dell'immagine principale -->
     <div>
       <!-- Immagine principale -->
       <div class="main-image">
-        <img id="main-image" src={blok.image.filename} alt={blok.title} class="w-full object-cover" />
+        <img id="main-image" src={blok.image.filename} alt={blok.title} class="w-full object-cover cursor-default" />
       </div>
 
       <!-- Thumbnails -->
-      <div class="thumbs flex space-x-2 mt-4">
-        {blok.thumbnails?.map(thumbnail => (
-          <img 
-            src={thumbnail.filename}
-            alt={blok.title}
-            class="thumb w-20 cursor-pointer transition-opacity duration-300 hover:opacity-70" 
-            data-fullsize={thumbnail.filename}
-          />
+      <div id="my-gallery" class="thumbs flex space-x-2 mt-4">
+        <!-- Aggiungi l'immagine principale come primo thumbnail -->
+        <a 
+          href={blok.image.filename} 
+          data-pswp-width={extractDimensionsFromURL(blok.image.filename).width} 
+          data-pswp-height={extractDimensionsFromURL(blok.image.filename).height} 
+          class="thumb w-20 cursor-pointer transition-opacity duration-300 hover:opacity-70"
+        >
+          <img src={blok.image.filename} alt={blok.title} />
+        </a>
+        {blok.thumbnails?.map((thumbnail, index) => (
+          <a 
+            key={index}
+            href={thumbnail.filename} 
+            data-pswp-width={extractDimensionsFromURL(thumbnail.filename).width} 
+            data-pswp-height={extractDimensionsFromURL(thumbnail.filename).height}
+            class="thumb w-20 cursor-pointer transition-opacity duration-300 hover:opacity-70"
+          >
+            <img src={thumbnail.filename} alt={blok.title} />
+          </a>
         ))}
       </div>
     </div>
@@ -37,7 +59,7 @@ const { blok } = Astro.props
       <!-- Selezione della taglia -->
       <div class="size-selection flex flex-wrap gap-2">
         {blok.sizes?.map(size => (
-          <div>
+          <div key={size}>
             <input
               type="radio"
               id={`size-${size}`}
@@ -71,80 +93,51 @@ const { blok } = Astro.props
       </button>
     </div>
   </div>
-
-  <!-- Lightbox -->
-  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-    <span class="close">&times;</span>
-    <img class="lightbox-content" id="lightbox-image" />
-    <div id="caption"></div>
-  </div>
 </div>
 
 <script>
-  if (window.location.pathname.includes('/products/')) {
-    // Gestione delle miniature
-    const thumbs = document.querySelectorAll('.thumb');
-    thumbs.forEach(thumb => {
-      thumb.addEventListener('click', function() {
-        const fullsizeSrc = this.getAttribute('data-fullsize');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImage = document.getElementById('lightbox-image');
-        const caption = document.getElementById('caption');
+  import 'photoswipe/style.css';
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+  import PhotoSwipe from 'photoswipe';
 
-        if (lightbox && lightboxImage && caption) {
-          lightbox.style.display = 'block';
-          lightboxImage.src = fullsizeSrc;
-          caption.innerHTML = this.alt || 'No caption available';
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '#my-gallery',
+    children: 'a',
+    pswpModule: PhotoSwipe
+  });
+
+  lightbox.init();
+
+  // Gestione della selezione della taglia e attivazione del pulsante Add to Cart
+  const sizeInputs = document.querySelectorAll('.size-input');
+  const addButton = document.querySelector('.snipcart-add-item');
+
+  if (sizeInputs.length > 0 && addButton) {
+    sizeInputs.forEach(input => {
+      input.addEventListener('change', () => {
+        const selectedSize = document.querySelector('.size-input:checked');
+        if (selectedSize) {
+          const selectedSizeValue = selectedSize.dataset.size;
+          addButton.disabled = false;
+          addButton.setAttribute('data-item-custom1-value', selectedSizeValue);
+
+          addButton.style.backgroundColor = '';
+          addButton.style.color = '';
+
+          const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`);
+          if (selectedSizeButton) {
+            const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
+            const color = getComputedStyle(selectedSizeButton).color;
+            addButton.style.backgroundColor = backgroundColor;
+            addButton.style.color = color;
+          }
         } else {
-          console.error('Elementi del lightbox mancanti.');
+          addButton.disabled = true;
+          addButton.style.backgroundColor = '#ccc';
+          addButton.style.color = '#666';
         }
       });
     });
-
-    // Gestione della chiusura del lightbox
-    function closeLightbox() {
-      const lightbox = document.getElementById('lightbox');
-      if (lightbox) {
-        lightbox.style.display = 'none';
-      }
-    }
-
-    window.closeLightbox = closeLightbox;
-
-    // Gestione della selezione della taglia
-    const sizeInputs = document.querySelectorAll('.size-input');
-    const addButton = document.querySelector('.snipcart-add-item');
-
-    if (sizeInputs.length > 0 && addButton) {
-      sizeInputs.forEach(input => {
-        input.addEventListener('change', () => {
-          const selectedSize = document.querySelector('.size-input:checked');
-          if (selectedSize) {
-            const selectedSizeValue = selectedSize.dataset.size;
-            addButton.disabled = false;
-            addButton.setAttribute('data-item-custom1-value', selectedSizeValue);
-
-            addButton.style.backgroundColor = '';
-            addButton.style.color = '';
-
-            const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`);
-            if (selectedSizeButton) {
-              const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
-              const color = getComputedStyle(selectedSizeButton).color;
-              console.log('Applying styles:', backgroundColor, color);
-              addButton.style.backgroundColor = backgroundColor;
-              addButton.style.color = color;
-            }
-          } else {
-            addButton.disabled = true;
-            addButton.style.backgroundColor = '#ccc';
-            addButton.style.color = '#666';
-          }
-        });
-      });
-    } else {
-      console.error('Selezione della taglia o pulsante non trovati.');
-    }
   }
 </script>
 
@@ -192,56 +185,6 @@ const { blok } = Astro.props
 
 .thumb:hover {
   opacity: 0.7;
-}
-
-/* Lightbox */
-.lightbox {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.lightbox-content {
-  margin: auto;
-  display: block;
-  max-width: 90%;
-  max-height: 80vh;
-}
-
-.lightbox .close {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  color: #fff;
-  font-size: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
-
-.lightbox .close:hover {
-  color: #bbb;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-#caption {
-  text-align: center;
-  padding: 10px;
-  color: #fff;
 }
 
 /* Stili per i dettagli del prodotto */

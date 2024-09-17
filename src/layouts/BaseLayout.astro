@@ -1,8 +1,6 @@
 ---
-// src/layouts/BaseLayout.astro
 import Header from '../components/Header.astro';
-
-import seoDefaults from '../seoDefaults'
+import seoDefaults from '../seoDefaults';
 
 const { 
   pageTitle = '',
@@ -40,12 +38,12 @@ const formattedTitle = pageTitle ? `${pageTitle}` : 'Milfoski';
     <meta name="twitter:image" content={pageTwitterImage} />
     
     <link rel="canonical" href={canonicalUrl} />
-  </head>
 
+    <!-- Caricamento Snipcart globale per l'icona del carrello -->
     <script>
       window.SnipcartSettings = {
         publicApiKey: "ZGM2ZmJkMzktNjUzYi00N2RhLTkwYmYtMTNjYjJlZGU3OTAxNjM4NTY4MDg0OTkxOTA5MDAz",
-        loadStrategy: "on-user-interaction",
+        loadStrategy: "on-user-interaction",  // Carica Snipcart solo quando l'utente interagisce
       };
 
       (function(){
@@ -110,16 +108,15 @@ const formattedTitle = pageTitle ? `${pageTitle}` : 'Milfoski';
         }
 
         function h(t) {
-          !y || (
-            t.dataset.apiKey=window.SnipcartSettings.publicApiKey,
-            window.SnipcartSettings.addProductBehavior && (t.dataset.configAddProductBehavior=window.SnipcartSettings.addProductBehavior),
-            window.SnipcartSettings.modalStyle && (t.dataset.configModalStyle=window.SnipcartSettings.modalStyle),
-            window.SnipcartSettings.currency && (t.dataset.currency=window.SnipcartSettings.currency),
-            window.SnipcartSettings.templatesUrl && (t.dataset.templatesUrl=window.SnipcartSettings.templatesUrl)
-          );
+          t.dataset.apiKey=window.SnipcartSettings.publicApiKey;
+          window.SnipcartSettings.addProductBehavior && (t.dataset.configAddProductBehavior=window.SnipcartSettings.addProductBehavior);
+          window.SnipcartSettings.modalStyle && (t.dataset.configModalStyle=window.SnipcartSettings.modalStyle);
+          window.SnipcartSettings.currency && (t.dataset.currency=window.SnipcartSettings.currency);
+          window.SnipcartSettings.templatesUrl && (t.dataset.templatesUrl=window.SnipcartSettings.templatesUrl);
         }
       })();
     </script>
+  </head>
 
   <body class='container mx-auto'>
     <Header />

@@ -35,6 +35,34 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
     object-fit: contain;
     margin: auto;
   }
+
+  /* Margine interno al contenitore per evitare che tocchi il bordo */
+  .gallery-item {
+    padding: 0 15px; /* Uniforma il padding laterale */
+  }
+
+  /* Assicura che l'immagine non provochi scrolling orizzontale */
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Padding e margine coerenti con la pagina prodotto */
+  article {
+    padding: 0 20px; /* Aggiusta il padding a destra e sinistra per renderlo simile al prodotto */
+  }
+
+  /* Gestione dei margini specifica per mobile */
+  @media (max-width: 768px) {
+    .gallery-item {
+      padding: 0 10px; /* Riduce il padding interno su mobile */
+    }
+
+    article {
+      padding: 0 15px; /* Riduce il padding laterale su mobile per mantenere coerenza */
+    }
+  }
 </style>
 
 <article {...storyblokEditable(blok)} class="flex flex-col items-center my-12">
@@ -57,6 +85,12 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
             href={`${imageUrlBase}/m/1600x0`}
             data-pswp-width={width}
             data-pswp-height={height}
+            data-pswp-srcset={`
+              ${imageUrlBase}/m/700x0 700w,
+              ${imageUrlBase}/m/1000x0 1000w,
+              ${imageUrlBase}/m/1600x0 1600w
+            `}
+            sizes="(max-width: 768px) 700px, (max-width: 1024px) 1000px, 1600px"
             class="relative gallery-item"
           >
             <picture>

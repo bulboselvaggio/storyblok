@@ -12,17 +12,16 @@ const headerMenu = data?.story?.content?.header_menu;
   <div class="container h-full mx-auto flex items-center justify-between">
     <!-- Logo -->
     <a href="/">
-      <h1 class="text-[#50b0ae] text-3xl font-bold">Milfoski</h1> <!-- Logo sempre verde -->
+      <h1 class="text-[#50b0ae] text-3xl font-bold">Milfoski</h1>
     </a>
 
     <!-- Mobile cart and hamburger -->
     <div class="flex lg:hidden items-center space-x-4 relative">
       <button id="cart-button" class="snipcart-checkout relative">
         <!-- Updated Cart Icon (shopping bag) -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 64 64" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black transition-colors duration-300 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" fill="currentColor"></path>
         </svg>
-
         <!-- Badge for item count -->
         <span id="cart-badge" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"></span>
       </button>
@@ -49,13 +48,11 @@ const headerMenu = data?.story?.content?.header_menu;
           ))
         }
       </ul>
-
       <!-- Cart Button for Desktop -->
       <button id="cart-button-desktop" class="snipcart-checkout relative">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 64 64" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black transition-colors duration-300 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" fill="currentColor"></path>
         </svg>
-
         <!-- Badge for item count -->
         <span id="cart-badge-desktop" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"></span>
       </button>
@@ -64,6 +61,8 @@ const headerMenu = data?.story?.content?.header_menu;
     <!-- Mobile Menu (hidden by default) -->
     <div id="mobile-menu" class="transform -translate-x-full fixed top-0 left-0 w-64 bg-[#f7f6fd] h-full z-50 shadow-lg transition-transform duration-300">
       <div class="p-6 pt-24">
+        <!-- SVG for Milfoski face -->
+        <img id="milfoski-svg" src="/milfoski-nav0.svg" alt="Milfoski Face" class="w-full mb-4">
         <ul class="space-y-4 text-lg font-bold text-center">
           {
             headerMenu.map((menu) => (
@@ -84,7 +83,7 @@ const headerMenu = data?.story?.content?.header_menu;
 document.addEventListener('DOMContentLoaded', function () {
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobile-menu');
-  const cartButtons = document.querySelectorAll('.snipcart-checkout');
+  const svgContainer = document.getElementById('milfoski-svg');
   let menuOpen = false;
 
   // Toggle menu and animate hamburger icon
@@ -113,6 +112,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // Function to open Snipcart cart if available
+  function openSnipcartCart() {
+    if (window.Snipcart?.api?.modal) {
+      window.Snipcart.api.modal.show();
+    } else {
+      setTimeout(openSnipcartCart, 500);
+    }
+  }
+
   // Badge visibility logic
   function updateCartCount() {
     const cartBadge = document.getElementById('cart-badge');
@@ -130,14 +138,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Ensure Snipcart is fully loaded before enabling the cart buttons
+  // Ensure Snipcart is fully loaded before the cart button works
   document.addEventListener('snipcart.ready', () => {
+    const cartButtons = document.querySelectorAll('.snipcart-checkout');
     cartButtons.forEach(button => {
-      button.classList.add('enabled');
       button.addEventListener('click', function () {
-        if (window.Snipcart?.api?.modal) {
-          window.Snipcart.api.modal.show();
-        }
+        openSnipcartCart();
       });
     });
 
@@ -149,36 +155,61 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize the badge on page load
     updateCartCount();
   });
+
+  // Hover functionality to change Milfoski face
+  const navLinks = document.querySelectorAll('#mobile-menu ul li a');
+  
+  // Support both hover for desktop and click for mobile
+  navLinks.forEach((link, index) => {
+    // Mouse hover for desktop
+    link.addEventListener('mouseenter', () => {
+      svgContainer.src = `/milfoski-nav${index + 1}.svg`;
+    });
+
+    link.addEventListener('mouseleave', () => {
+      svgContainer.src = `/milfoski-nav0.svg`;
+    });
+
+    // Tap event for mobile
+    link.addEventListener('click', () => {
+      svgContainer.src = `/milfoski-nav${index + 1}.svg`;
+    });
+  });
 });
+
 </script>
 
+
+
 <style>
-  #mobile-menu {
-    transition: transform 0.3s ease-in-out;
-  }
+#mobile-menu {
+  transition: transform 0.3s ease-in-out;
+}
 
-  .snipcart-checkout.enabled svg {
-    transition: color 0.3s ease;
-  }
+#cart-badge, #cart-badge-desktop {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e3342f;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  display: none; /* Il badge è nascosto di default */
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  pointer-events: none;
+}
 
-  .snipcart-checkout.enabled:hover svg {
-    color: #50b0ae;
-  }
+#milfoski-svg-container {
+  width: 100%;
+  text-align: center;
+}
 
-  #cart-badge, #cart-badge-desktop {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #e3342f;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: bold;
-    width: 20px;
-    height: 20px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9999px;
-    pointer-events: none;
-  }
+#milfoski-svg {
+  width: 100%;
+}
+
 </style>

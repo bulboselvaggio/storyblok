@@ -16,12 +16,15 @@ const headerMenu = data?.story?.content?.header_menu;
     </a>
 
     <!-- Mobile cart and hamburger -->
-    <div class="flex lg:hidden items-center space-x-4">
-      <button id="cart-button" class="snipcart-checkout">
+    <div class="flex lg:hidden items-center space-x-4 relative">
+      <button id="cart-button" class="snipcart-checkout relative">
         <!-- Updated Cart Icon (shopping bag) -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black transition-colors duration-300 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 64 64" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" />
         </svg>
+
+        <!-- Badge for item count -->
+        <span id="cart-badge" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"></span>
       </button>
 
       <!-- Hamburger Icon -->
@@ -48,10 +51,13 @@ const headerMenu = data?.story?.content?.header_menu;
       </ul>
 
       <!-- Cart Button for Desktop -->
-      <button id="cart-button-desktop" class="snipcart-checkout">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black transition-colors duration-300 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
+      <button id="cart-button-desktop" class="snipcart-checkout relative">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 64 64" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" />
         </svg>
+
+        <!-- Badge for item count -->
+        <span id="cart-badge-desktop" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"></span>
       </button>
     </nav>
 
@@ -74,61 +80,76 @@ const headerMenu = data?.story?.content?.header_menu;
   </div>
 </header>
 
-
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobile-menu');
-    let menuOpen = false;
+document.addEventListener('DOMContentLoaded', function () {
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const cartButtons = document.querySelectorAll('.snipcart-checkout');
+  let menuOpen = false;
 
-    // Toggle menu and animate hamburger icon
-    hamburger?.addEventListener('click', function () {
-      menuOpen = !menuOpen;
-      if (menuOpen) {
-        mobileMenu.classList.remove('-translate-x-full');
-        mobileMenu.classList.add('translate-x-0');
-      } else {
-        mobileMenu.classList.remove('translate-x-0');
-        mobileMenu.classList.add('-translate-x-full');
-      }
-
-      // Animate to "X" when menu is open
-      const line1 = document.getElementById('line1');
-      const line2 = document.getElementById('line2');
-      const line3 = document.getElementById('line3');
-
-      if (menuOpen) {
-        line1.style.transform = 'rotate(45deg) translateY(8px)';
-        line2.style.opacity = '0';
-        line3.style.transform = 'rotate(-45deg) translateY(-8px)';
-        line1.style.backgroundColor = 'black'; // Ensure line stays black
-      } else {
-        line1.style.transform = '';
-        line2.style.opacity = '1';
-        line3.style.transform = '';
-        line1.style.backgroundColor = 'black'; // Ensure color stays consistent
-      }
-    });
-
-    // Function to open Snipcart cart if available
-    function openSnipcartCart() {
-      if (window.Snipcart?.api?.modal) {
-        window.Snipcart.api.modal.show();
-      } else {
-        setTimeout(openSnipcartCart, 500);
-      }
+  // Toggle menu and animate hamburger icon
+  hamburger?.addEventListener('click', function () {
+    menuOpen = !menuOpen;
+    if (menuOpen) {
+      mobileMenu.classList.remove('-translate-x-full');
+      mobileMenu.classList.add('translate-x-0');
+    } else {
+      mobileMenu.classList.remove('translate-x-0');
+      mobileMenu.classList.add('-translate-x-full');
     }
 
-    // Ensure Snipcart is fully loaded before the cart button works
-    document.addEventListener('snipcart.ready', () => {
-      const cartButtons = document.querySelectorAll('.snipcart-checkout');
-      cartButtons.forEach(button => {
-        button.addEventListener('click', function () {
-          openSnipcartCart();
-        });
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+    const line3 = document.getElementById('line3');
+
+    if (menuOpen) {
+      line1.style.transform = 'rotate(45deg) translateY(8px)';
+      line2.style.opacity = '0';
+      line3.style.transform = 'rotate(-45deg) translateY(-8px)';
+    } else {
+      line1.style.transform = '';
+      line2.style.opacity = '1';
+      line3.style.transform = '';
+    }
+  });
+
+  // Badge visibility logic
+  function updateCartCount() {
+    const cartBadge = document.getElementById('cart-badge');
+    const cartBadgeDesktop = document.getElementById('cart-badge-desktop');
+    const cartItems = window.Snipcart.store.getState().cart.items.count;
+
+    if (cartItems > 0) {
+      cartBadge.style.display = 'flex';
+      cartBadge.textContent = cartItems;
+      cartBadgeDesktop.style.display = 'flex';
+      cartBadgeDesktop.textContent = cartItems;
+    } else {
+      cartBadge.style.display = 'none';
+      cartBadgeDesktop.style.display = 'none';
+    }
+  }
+
+  // Ensure Snipcart is fully loaded before enabling the cart buttons
+  document.addEventListener('snipcart.ready', () => {
+    cartButtons.forEach(button => {
+      button.classList.add('enabled');
+      button.addEventListener('click', function () {
+        if (window.Snipcart?.api?.modal) {
+          window.Snipcart.api.modal.show();
+        }
       });
     });
+
+    // Update the cart count badge when the cart is updated
+    window.Snipcart.store.subscribe(() => {
+      updateCartCount();
+    });
+
+    // Initialize the badge on page load
+    updateCartCount();
   });
+});
 </script>
 
 <style>
@@ -136,4 +157,28 @@ const headerMenu = data?.story?.content?.header_menu;
     transition: transform 0.3s ease-in-out;
   }
 
+  .snipcart-checkout.enabled svg {
+    transition: color 0.3s ease;
+  }
+
+  .snipcart-checkout.enabled:hover svg {
+    color: #50b0ae;
+  }
+
+  #cart-badge, #cart-badge-desktop {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #e3342f;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    pointer-events: none;
+  }
 </style>

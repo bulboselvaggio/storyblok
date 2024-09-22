@@ -61,8 +61,8 @@ const headerMenu = data?.story?.content?.header_menu;
     <!-- Mobile Menu (hidden by default) -->
     <div id="mobile-menu" class="transform -translate-x-full fixed top-0 left-0 w-64 bg-[#f7f6fd] h-full z-50 shadow-lg transition-transform duration-300">
       <div class="p-6 pt-12">
-        <!-- SVG for Milfoski face -->
-        <img id="milfoski-svg" src="/milfoski-nav0.svg" alt="Milfoski Face" class="w-full mb-4">
+        <!-- SVG placeholder, caricato solo quando necessario -->
+        <img id="milfoski-svg" data-src="https://a.storyblok.com/f/297215/212x259/fcf5838be0/milfoski-nav0.svg" alt="Milfoski Face" class="w-full mb-4 lazyload">
         <ul class="space-y-4 text-lg font-bold text-center">
           {
             headerMenu.map((menu) => (
@@ -79,6 +79,9 @@ const headerMenu = data?.story?.content?.header_menu;
   </div>
 </header>
 
+  </div>
+</header>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const hamburger = document.getElementById('hamburger');
@@ -86,12 +89,21 @@ document.addEventListener('DOMContentLoaded', function () {
   const svgContainer = document.getElementById('milfoski-svg');
   let menuOpen = false;
 
+  // Lazy load SVG when the menu is opened
+  function lazyLoadSVG() {
+    if (svgContainer.dataset.src) {
+      svgContainer.src = svgContainer.dataset.src;
+      svgContainer.removeAttribute('data-src');
+    }
+  }
+
   // Toggle menu and animate hamburger icon
   hamburger?.addEventListener('click', function () {
     menuOpen = !menuOpen;
     if (menuOpen) {
       mobileMenu.classList.remove('-translate-x-full');
       mobileMenu.classList.add('translate-x-0');
+      lazyLoadSVG();  // Carica l'SVG quando il menu è aperto
     } else {
       mobileMenu.classList.remove('translate-x-0');
       mobileMenu.classList.add('-translate-x-full');
@@ -156,30 +168,29 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCartCount();
   });
 
-  // Hover functionality to change Milfoski face
+  // Hover functionality to change Milfoski face on mobile (tap only)
   const navLinks = document.querySelectorAll('#mobile-menu ul li a');
   
-  // Support both hover for desktop and click for mobile
+  // Cambia l'SVG al touchstart per mobile
   navLinks.forEach((link, index) => {
-    // Mouse hover for desktop
-    link.addEventListener('mouseenter', () => {
-      svgContainer.src = `/milfoski-nav${index + 1}.svg`;
+    const svgUrls = [
+      'https://a.storyblok.com/f/297215/212x259/fcf5838be0/milfoski-nav0.svg',
+      'https://a.storyblok.com/f/297215/212x265/9275b49a10/milfoski-nav1.svg',
+      'https://a.storyblok.com/f/297215/212x272/63ae304c01/milfoski-nav2.svg',
+      'https://a.storyblok.com/f/297215/212x259/0d84069775/milfoski-nav3.svg'
+    ];
+
+    link.addEventListener('touchstart', () => {
+      svgContainer.src = svgUrls[index + 1];
     });
 
-    link.addEventListener('mouseleave', () => {
-      svgContainer.src = `/milfoski-nav0.svg`;
-    });
-
-    // Tap event for mobile
+    // Cambia SVG su click
     link.addEventListener('click', () => {
-      svgContainer.src = `/milfoski-nav${index + 1}.svg`;
+      svgContainer.src = svgUrls[index + 1];
     });
   });
 });
-
 </script>
-
-
 
 <style>
 #mobile-menu {

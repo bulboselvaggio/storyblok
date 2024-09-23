@@ -3,18 +3,24 @@ import { storyblokEditable, useStoryblokApi } from '@storyblok/astro';
 import Navigation from '../components/Navigation.astro'; // Importa il componente di navigazione
 
 const { blok } = Astro.props;
+
 // Ottieni lo slug dall'URL
 const currentSlug = Astro.url.pathname.split('/').pop();
 
-// Ottieni tutti gli articoli dal blog
+// Ottieni l'articolo corrente dallo slug
 const storyblokApi = useStoryblokApi();
+const { data: currentArticleData } = await storyblokApi.get(`cdn/stories/blog/${currentSlug}`, {
+  version: 'published', // Cambia in 'draft' per sviluppo locale
+});
+
+// Recupera tutti gli articoli ordinati per data (dal più recente al meno recente)
 const { data } = await storyblokApi.get(`cdn/stories`, {
-  version: 'published',
+  version: 'published', // Cambia in 'draft' per sviluppo locale
   starts_with: 'blog/',
   is_startpage: 0,
 });
 
-// Filtra articoli con data e slug valido
+// Filtra e ordina gli articoli
 function getSortedArticlesWithDate(articles) {
   return articles
     .filter(article => article.content.date && article.slug) // Verifica la presenza di date e slug
@@ -26,7 +32,7 @@ const articles = getSortedArticlesWithDate(data.stories || []);
 // Trova l'indice dell'articolo corrente
 const currentIndex = articles.findIndex(article => article.slug === currentSlug);
 
-// Trova l'articolo precedente e successivo in base all'indice corrente
+// Se l'articolo corrente è trovato, trova l'articolo precedente e successivo
 const previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
 const nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
 
@@ -150,11 +156,11 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
     )}
   </div>
 
-<Navigation 
-  previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
-  nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 
-/>
-
+  <!-- Componente di navigazione per prev e next -->
+  <Navigation 
+    previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
+    nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 
+  />
 </article>
 
 <script>

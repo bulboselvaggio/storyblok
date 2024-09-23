@@ -1,7 +1,34 @@
 ---
-import { storyblokEditable } from '@storyblok/astro';
+import { storyblokEditable, useStoryblokApi } from '@storyblok/astro';
+import Navigation from '../components/Navigation.astro'; // Importa il componente di navigazione
 
 const { blok } = Astro.props;
+// Ottieni lo slug dall'URL
+const currentSlug = Astro.url.pathname.split('/').pop();
+
+// Ottieni tutti gli articoli dal blog
+const storyblokApi = useStoryblokApi();
+const { data } = await storyblokApi.get(`cdn/stories`, {
+  version: 'draft',
+  starts_with: 'blog/',
+  is_startpage: 0,
+});
+
+// Filtra articoli con data e slug valido
+function getSortedArticlesWithDate(articles) {
+  return articles
+    .filter(article => article.content.date && article.slug) // Verifica la presenza di date e slug
+    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date)); // Ordina per data
+}
+
+const articles = getSortedArticlesWithDate(data.stories || []);
+
+// Trova l'indice dell'articolo corrente
+const currentIndex = articles.findIndex(article => article.slug === currentSlug);
+
+// Trova l'articolo precedente e successivo in base all'indice corrente
+const previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
+const nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
 
 // Funzione per estrarre il numero dal nome del file e ordinare le immagini
 function sortImagesByFilename(images) {
@@ -122,6 +149,12 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
       <p>No images available.</p>
     )}
   </div>
+
+<Navigation 
+  previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
+  nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 
+/>
+
 </article>
 
 <script>

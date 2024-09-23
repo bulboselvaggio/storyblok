@@ -156,12 +156,21 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
     )}
   </div>
 
-  <!-- Componente di navigazione per prev e next -->
-  <Navigation 
-    previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
-    nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 
-  />
+  <!-- Navigazione tra articoli senza il componente -->
+  <nav class="w-full flex justify-between mt-12">
+    {previousArticle && (
+      <a href={`/blog/${previousArticle.slug}`} class="text-lg text-[#50b0ae] font-bold">
+        ← Articolo precedente: {previousArticle.content.title}
+      </a>
+    )}
+    {nextArticle && (
+      <a href={`/blog/${nextArticle.slug}`} class="text-lg text-[#50b0ae] font-bold">
+        Articolo successivo: {nextArticle.content.title} →
+      </a>
+    )}
+  </nav>
 </article>
+
 
 <script>
   import 'photoswipe/style.css';

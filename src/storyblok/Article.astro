@@ -9,7 +9,7 @@ const currentSlug = Astro.url.pathname.split('/').pop();
 // Ottieni tutti gli articoli dal blog
 const storyblokApi = useStoryblokApi();
 const { data } = await storyblokApi.get(`cdn/stories`, {
-  version: 'public',
+  version: 'published',
   starts_with: 'blog/',
   is_startpage: 0,
 });

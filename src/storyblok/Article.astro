@@ -7,42 +7,44 @@ const { blok } = Astro.props;
 const currentSlug = Astro.url.pathname.split('/').pop();
 
 // Ottieni tutti gli articoli dal blog
-const storyblokApi = useStoryblokApi();
-const timestamp = Math.floor(Date.now() / 1000); // Timestamp per forzare il refresh della cache
-const { data } = await storyblokApi.get(`cdn/stories`, {
-  version: 'published', // Usa la versione pubblicata per il deploy
-  starts_with: 'blog/',
-  is_startpage: 0,
-  cv: timestamp, // Forza il refresh della cache per evitare dati vecchi
-});
+let storyblokApi;
+let articles = [];
+let previousArticle = null;
+let nextArticle = null;
 
-// Aggiungi un controllo sui dati
-if (!data || !data.stories || data.stories.length === 0) {
-  console.error('No articles found or data not loaded correctly');
-  return;
-}
+try {
+  storyblokApi = useStoryblokApi();
+  const { data } = await storyblokApi.get(`cdn/stories`, {
+    version: 'draft', // or 'published'
+    starts_with: 'blog/',
+    is_startpage: 0,
+  });
 
-// Filtra articoli con data e slug valido
-function getSortedArticlesWithDate(articles) {
-  return articles
-    .filter(article => article.content.date && article.slug) // Verifica la presenza di date e slug
-    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date)); // Ordina per data
-}
+  if (!data || !data.stories) {
+    console.error("Data stories is undefined or empty", data);
+    return;
+  }
 
-const articles = getSortedArticlesWithDate(data.stories || []);
+  // Filtra articoli con data e slug valido
+  articles = data.stories
+    .filter(article => article.content.date && article.slug)
+    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
+  
+  // Logging ulteriore
+  console.log("Articles retrieved:", articles.map(article => article.slug));
+  
+  // Trova l'indice dell'articolo corrente
+  const currentIndex = articles.findIndex(article => article.slug === currentSlug);
+  previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
+  nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
 
-// Trova l'indice dell'articolo corrente
-const currentIndex = articles.findIndex(article => article.slug === currentSlug);
-
-// Aggiungi un log per debug solo in ambiente locale
-if (import.meta.env.DEV) {
+  // Log dei risultati
   console.log("Current slug:", currentSlug);
-  console.log("Articles retrieved:", articles.map(a => a.slug));
+  console.log("Previous article:", previousArticle);
+  console.log("Next article:", nextArticle);
+} catch (error) {
+  console.error("Error fetching stories from Storyblok:", error);
 }
-
-// Trova l'articolo precedente e successivo in base all'indice corrente
-const previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
-const nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
 
 // Funzione per estrarre il numero dal nome del file e ordinare le immagini
 function sortImagesByFilename(images) {
@@ -164,7 +166,7 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
     )}
   </div>
 
-  <!-- Navigation component -->
+  <!-- Navigazione tra articoli -->
   <Navigation 
     previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
     nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 

@@ -5,6 +5,7 @@ import Navigation from '../components/Navigation.astro'; // Importa il component
 const { blok } = Astro.props;
 // Ottieni lo slug dall'URL
 const currentSlug = Astro.url.pathname.split('/').pop();
+console.log("Current slug:", currentSlug); // Log dello slug corrente
 
 // Ottieni tutti gli articoli dal blog
 let storyblokApi;
@@ -33,15 +34,19 @@ try {
   // Logging ulteriore
   console.log("Articles retrieved:", articles.map(article => article.slug));
   
-  // Trova l'indice dell'articolo corrente
-  const currentIndex = articles.findIndex(article => article.slug === currentSlug);
-  previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
-  nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
+  // Trova l'indice dell'articolo corrente usando `full_slug`
+  const currentIndex = articles.findIndex(article => article.full_slug === `blog/${currentSlug}`);
+  console.log("Current index:", currentIndex);
 
-  // Log dei risultati
-  console.log("Current slug:", currentSlug);
-  console.log("Previous article:", previousArticle);
-  console.log("Next article:", nextArticle);
+  if (currentIndex === -1) {
+    console.error("Current article not found in the list");
+  } else {
+    previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
+    nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
+    
+    console.log("Previous article:", previousArticle);
+    console.log("Next article:", nextArticle);
+  }
 } catch (error) {
   console.error("Error fetching stories from Storyblok:", error);
 }

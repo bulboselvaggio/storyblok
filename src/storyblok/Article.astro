@@ -8,11 +8,19 @@ const currentSlug = Astro.url.pathname.split('/').pop();
 
 // Ottieni tutti gli articoli dal blog
 const storyblokApi = useStoryblokApi();
+const timestamp = Math.floor(Date.now() / 1000); // Timestamp per forzare il refresh della cache
 const { data } = await storyblokApi.get(`cdn/stories`, {
-  version: 'published', // or 'published'
+  version: 'published', // Usa la versione pubblicata per il deploy
   starts_with: 'blog/',
   is_startpage: 0,
+  cv: timestamp, // Forza il refresh della cache per evitare dati vecchi
 });
+
+// Aggiungi un controllo sui dati
+if (!data || !data.stories || data.stories.length === 0) {
+  console.error('No articles found or data not loaded correctly');
+  return;
+}
 
 // Filtra articoli con data e slug valido
 function getSortedArticlesWithDate(articles) {
@@ -25,6 +33,12 @@ const articles = getSortedArticlesWithDate(data.stories || []);
 
 // Trova l'indice dell'articolo corrente
 const currentIndex = articles.findIndex(article => article.slug === currentSlug);
+
+// Aggiungi un log per debug solo in ambiente locale
+if (import.meta.env.DEV) {
+  console.log("Current slug:", currentSlug);
+  console.log("Articles retrieved:", articles.map(a => a.slug));
+}
 
 // Trova l'articolo precedente e successivo in base all'indice corrente
 const previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
@@ -150,11 +164,11 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
     )}
   </div>
 
-<Navigation 
-  previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
-  nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 
-/>
-
+  <!-- Navigation component -->
+  <Navigation 
+    previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
+    nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 
+  />
 </article>
 
 <script>
@@ -169,10 +183,4 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
   });
 
   lightbox.init();
-
-console.log("Articles retrieved from Storyblok:", data.stories);
-console.log("Current slug:", currentSlug);
-console.log("Previous article:", previousArticle);
-console.log("Next article:", nextArticle);
-
 </script>

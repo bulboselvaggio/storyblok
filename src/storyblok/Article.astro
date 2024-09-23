@@ -3,24 +3,18 @@ import { storyblokEditable, useStoryblokApi } from '@storyblok/astro';
 import Navigation from '../components/Navigation.astro'; // Importa il componente di navigazione
 
 const { blok } = Astro.props;
-
 // Ottieni lo slug dall'URL
 const currentSlug = Astro.url.pathname.split('/').pop();
 
-// Ottieni l'articolo corrente dallo slug
+// Ottieni tutti gli articoli dal blog
 const storyblokApi = useStoryblokApi();
-const { data: currentArticleData } = await storyblokApi.get(`cdn/stories/blog/${currentSlug}`, {
-  version: 'published', // Cambia in 'draft' per sviluppo locale
-});
-
-// Recupera tutti gli articoli ordinati per data (dal più recente al meno recente)
 const { data } = await storyblokApi.get(`cdn/stories`, {
-  version: 'published', // Cambia in 'draft' per sviluppo locale
+  version: 'published', // or 'published'
   starts_with: 'blog/',
   is_startpage: 0,
 });
 
-// Filtra e ordina gli articoli
+// Filtra articoli con data e slug valido
 function getSortedArticlesWithDate(articles) {
   return articles
     .filter(article => article.content.date && article.slug) // Verifica la presenza di date e slug
@@ -32,7 +26,7 @@ const articles = getSortedArticlesWithDate(data.stories || []);
 // Trova l'indice dell'articolo corrente
 const currentIndex = articles.findIndex(article => article.slug === currentSlug);
 
-// Se l'articolo corrente è trovato, trova l'articolo precedente e successivo
+// Trova l'articolo precedente e successivo in base all'indice corrente
 const previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
 const nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
 
@@ -156,21 +150,12 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
     )}
   </div>
 
-  <!-- Navigazione tra articoli senza il componente -->
-  <nav class="w-full flex justify-between mt-12">
-    {previousArticle && (
-      <a href={`/blog/${previousArticle.slug}`} class="text-lg text-[#50b0ae] font-bold">
-        ← Articolo precedente: {previousArticle.content.title}
-      </a>
-    )}
-    {nextArticle && (
-      <a href={`/blog/${nextArticle.slug}`} class="text-lg text-[#50b0ae] font-bold">
-        Articolo successivo: {nextArticle.content.title} →
-      </a>
-    )}
-  </nav>
-</article>
+<Navigation 
+  previousItem={previousArticle ? { name: previousArticle.content.title, url: `/blog/${previousArticle.slug}` } : null} 
+  nextItem={nextArticle ? { name: nextArticle.content.title, url: `/blog/${nextArticle.slug}` } : null} 
+/>
 
+</article>
 
 <script>
   import 'photoswipe/style.css';
@@ -184,4 +169,10 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
   });
 
   lightbox.init();
+
+console.log("Articles retrieved from Storyblok:", data.stories);
+console.log("Current slug:", currentSlug);
+console.log("Previous article:", previousArticle);
+console.log("Next article:", nextArticle);
+
 </script>

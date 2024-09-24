@@ -7,8 +7,6 @@ const { blok } = Astro.props;
 // Ottieni lo slug dall'URL
 const currentFullSlug = Astro.url.pathname.replace(/^\/|\/$/g, ''); // Rimuove slash iniziale e finale
 
-console.log("Current full slug:", currentFullSlug); // Log dello slug corrente
-
 // Ottieni tutti gli articoli dal blog
 let storyblokApi;
 let articles = [];
@@ -23,31 +21,18 @@ try {
     is_startpage: 0,
   });
 
-  if (!data || !data.stories) {
-    console.error("Data stories is undefined or empty", data);
-    return;
-  }
-
   // Filtra articoli con data e slug valido
   articles = data.stories
     .filter(article => article.content.date && article.full_slug)
     .sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
   
-  console.log("Articles retrieved:", articles.map(article => article.full_slug));
-  
   // Trova l'indice dell'articolo corrente usando `full_slug`
   const currentIndex = articles.findIndex(article => article.full_slug === currentFullSlug);
-  console.log("Current index:", currentIndex);
 
-  if (currentIndex === -1) {
-    console.error("Current article not found in the list");
-  } else {
+  if (currentIndex !== -1) {
     // Assegna l'articolo precedente e successivo se esistono
     previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
     nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
-    
-    console.log("Previous article:", previousArticle);
-    console.log("Next article:", nextArticle);
   }
 } catch (error) {
   console.error("Error fetching stories from Storyblok:", error);

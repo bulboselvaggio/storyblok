@@ -168,10 +168,10 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCartCount();
   });
 
-  // Hover functionality to change Milfoski face on mobile (tap only)
+  // Hover functionality to change Milfoski face on mobile (click only)
   const navLinks = document.querySelectorAll('#mobile-menu ul li a');
-  
-  // Cambia l'SVG al touchstart per mobile
+
+  // Cambia l'SVG e aspetta il caricamento prima di seguire il link
   navLinks.forEach((link, index) => {
     const svgUrls = [
       'https://a.storyblok.com/f/297215/212x259/fcf5838be0/milfoski-nav0.svg',
@@ -180,17 +180,27 @@ document.addEventListener('DOMContentLoaded', function () {
       'https://a.storyblok.com/f/297215/212x259/0d84069775/milfoski-nav3.svg'
     ];
 
-    link.addEventListener('touchstart', () => {
-      svgContainer.src = svgUrls[index + 1];
-    });
+    link.addEventListener('click', (event) => {
+      event.preventDefault();  // Blocca il comportamento predefinito del link
 
-    // Cambia SVG su click
-    link.addEventListener('click', () => {
+      // Cambia SVG
       svgContainer.src = svgUrls[index + 1];
+
+      // Timeout di fallback
+      const fallbackTimeout = setTimeout(() => {
+        window.location.href = link.href;  // Redirect se il caricamento è troppo lento
+      }, 250);  // Timeout
+
+      // Aspetta che l'SVG si carichi
+      svgContainer.onload = function () {
+        clearTimeout(fallbackTimeout);  // Cancella il timeout se il caricamento avviene in tempo
+        window.location.href = link.href;  // Esegui il redirect dopo il caricamento
+      };
     });
   });
 });
 </script>
+
 
 <style>
 #mobile-menu {

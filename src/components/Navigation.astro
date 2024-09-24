@@ -1,12 +1,15 @@
 ---
 const { previousItem, nextItem } = Astro.props;
+
 ---
+
+
 
 <style>
 .navigation {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Allinea in alto per il contenuto */
   width: 100%;
   padding: 1.5rem 0;
   margin-top: 2rem;
@@ -14,7 +17,7 @@ const { previousItem, nextItem } = Astro.props;
 
 .navigation-link {
   display: flex;
-  align-items: center;
+  align-items: center; /* Mantiene allineati icona e testo */
   text-decoration: none;
   color: #50b0ae;
   font-size: 1.1rem;
@@ -28,16 +31,17 @@ const { previousItem, nextItem } = Astro.props;
 .navigation-link svg {
   width: 20px;
   height: 20px;
+  align-self: center; /* Mantiene lo chevron centrato verticalmente */
 }
 
 .navigation-left {
   justify-self: flex-start;
-  margin-left: 0.2rem; /* Ridotto il margine sinistro */
+  margin-left: 0.2rem;
 }
 
 .navigation-right {
   justify-self: flex-end;
-  margin-right: 0.2rem; /* Aggiustato il margine destro */
+  margin-right: 0.2rem;
   text-align: right;
 }
 
@@ -47,10 +51,27 @@ const { previousItem, nextItem } = Astro.props;
 }
 
 .navigation-title {
-  max-width: 20ch;
-  white-space: nowrap;
+  max-width: 30ch;
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limita a due righe */
+  -webkit-box-orient: vertical;
   text-overflow: ellipsis;
+  white-space: normal; /* Permette l'avvolgimento del testo */
+  word-wrap: break-word;
+  line-height: 1.2;
+  padding-bottom: 0.2rem; /* Aggiunge spazio per evitare il taglio della seconda riga */
+}
+
+@media (max-width: 768px) {
+  .navigation-title {
+    max-width: 15ch;
+    -webkit-line-clamp: 1; /* Limita a una riga sui piccoli schermi */
+  }
+
+  .navigation-link svg {
+    align-self: center; /* Mantiene lo chevron allineato verticalmente anche su mobile */
+  }
 }
 
 /* Allineamento del blocco Next a destra quando Prev è assente */
@@ -61,7 +82,6 @@ const { previousItem, nextItem } = Astro.props;
 .navigation.single-prev {
   justify-content: flex-start;
 }
-
 
 </style>
 

@@ -9,7 +9,7 @@ const { previousItem, nextItem } = Astro.props;
 .navigation {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* Allinea in alto per il contenuto */
+  align-items: flex-start; /* Allinea in alto il contenuto */
   width: 100%;
   padding: 1.5rem 0;
   margin-top: 2rem;
@@ -60,6 +60,7 @@ const { previousItem, nextItem } = Astro.props;
   white-space: normal; /* Permette l'avvolgimento del testo */
   word-wrap: break-word;
   line-height: 1.2;
+  max-height: 2.4em; /* Altezza massima per due righe */
   padding-bottom: 0.2rem; /* Aggiunge spazio per evitare il taglio della seconda riga */
 }
 
@@ -67,6 +68,7 @@ const { previousItem, nextItem } = Astro.props;
   .navigation-title {
     max-width: 15ch;
     -webkit-line-clamp: 1; /* Limita a una riga sui piccoli schermi */
+    max-height: 1.2em; /* Altezza massima per una riga */
   }
 
   .navigation-link svg {

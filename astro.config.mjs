@@ -30,6 +30,7 @@ export default defineConfig({
         'popular-products': 'storyblok/PopularProducts',
         'all-products': 'storyblok/AllProducts',
         product: 'storyblok/Product',
+        'all-books': 'storyblok/AllBooks',
         seo_meta: 'components/SeoMeta',
       },
     }),

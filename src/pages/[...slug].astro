@@ -10,7 +10,8 @@ export async function getStaticPaths() {
   const links = await storyblokApi.getAll('cdn/links', {
     version: 'draft',
   })
-  return links
+
+    return links
     .filter((link) => !link.is_folder)
     .map((link) => {
       return {

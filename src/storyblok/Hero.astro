@@ -1,45 +1,47 @@
 ---
-import { storyblokEditable, useStoryblokApi } from '@storyblok/astro'
-import Button from '../components/Button.astro' // Importa il componente bottone
+import { storyblokEditable, useStoryblokApi } from '@storyblok/astro';
+import Button from '../components/Button.astro'; // Importa il componente bottone
+import { Image } from 'astro:assets'; // Importa il componente Image
 
-const { blok } = Astro.props
+const { blok } = Astro.props;
 
-const storyblokApi = useStoryblokApi()
+const storyblokApi = useStoryblokApi();
 const { data } = await storyblokApi.get(`cdn/stories`, {
   version: 'draft', // or 'published'
   starts_with: 'blog/',
   is_startpage: 0,
-})
+});
 
 // Ottieni l'elenco degli articoli
-const articles = data.stories || []
+const articles = data.stories || [];
 
 // Funzione per trovare l'articolo più recente con il campo 'date' valorizzato
 function getMostRecentArticle(articles) {
   return articles
     .filter(article => article.content.date) // Filtra gli articoli con 'date' valorizzata
-    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date))[0]
+    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date))[0];
 }
 
-const recentArticle = getMostRecentArticle(articles)
-const recentImage = recentArticle?.content?.image?.filename || blok.background_image?.filename
+const recentArticle = getMostRecentArticle(articles);
+const recentImage = recentArticle?.content?.image?.filename || blok.background_image?.filename;
 
 // Immagine di fallback
-const fallbackImage = "https://a.storyblok.com/f/297215/2000x2000/679cbad1d5/anitatshirtfinished.jpg"
+const fallbackImage = "https://a.storyblok.com/f/297215/2000x2000/679cbad1d5/anitatshirtfinished.jpg";
 
 // Link dell'articolo recente o fallback a /blog
-const articleLink = recentArticle?.full_slug ? `/${recentArticle.full_slug}` : '/blog'
+const articleLink = recentArticle?.full_slug ? `/${recentArticle.full_slug}` : '/blog';
 
-let dynamicHeroClass = blok.layout === 'constrained' ? 'container mx-auto' : ''
+// Testo alternativo dinamico: usa l'alt dell'immagine di Storyblok se presente, altrimenti costruisci il fallback con il titolo della storia
+const altText = recentArticle?.content?.image?.alt || blok.background_image?.alt || `Detail of ${recentArticle?.content?.title || blok.headline}`;
+
+let dynamicHeroClass = blok.layout === 'constrained' ? 'container mx-auto' : '';
 ---
 
 <div
   {...storyblokEditable(blok)}
   class={`${dynamicHeroClass} min-h-[500px] relative flex items-end justify-center my-0 rounded-[5px] overflow-hidden`}
 >
-  <div
-    class="relative z-10 w-full text-center bg-gradient-to-t from-black/70 via-black/50 to-transparent py-6"
-  >
+  <div class="relative z-10 w-full text-center bg-gradient-to-t from-black/70 via-black/50 to-transparent py-6">
     <h1 class="text-6xl text-white font-bold mb-3">
       {blok.headline}
     </h1>
@@ -48,10 +50,11 @@ let dynamicHeroClass = blok.layout === 'constrained' ? 'container mx-auto' : ''
       {blok.subheadline}
     </h2>
 
-  <!-- Aggiunta classe personalizzata per margine extra solo in Hero -->
-  <Button href={articleLink} label="Read More" extraClasses="mb-6" /> 
-</div>
+    <!-- Aggiunta classe personalizzata per margine extra solo in Hero -->
+    <Button href={articleLink} label="Last Cartoon" extraClasses="mb-6" /> 
+  </div>
 
+  <!-- Usa il tag picture per servire formati AVIF e WebP -->
   <picture>
     <source
       srcSet={`${recentImage || fallbackImage}/m/500x750/filters:format(avif)`}
@@ -73,10 +76,14 @@ let dynamicHeroClass = blok.layout === 'constrained' ? 'container mx-auto' : ''
       type="image/webp"
       media="(max-width: 1024px)"
     />
-    <img
-      src={`${recentImage || fallbackImage}/m/1600x0`} 
-      alt={recentArticle?.content?.image?.alt || 'Hero Image'} 
+    <!-- Usa il componente Image di Astro per l'immagine principale -->
+    <Image
+      src={`${recentImage || fallbackImage}/m/1600x0`}
+      alt={altText}
       class="absolute top-0 left-0 z-0 w-full h-full object-cover"
+      width={1600}
+      height={900}
+      loading="eager" <!-- Cambiato da lazy a eager -->
     />
   </picture>
 </div>

@@ -1,7 +1,8 @@
 ---
-import { storyblokEditable } from '@storyblok/astro'
+import { storyblokEditable } from '@storyblok/astro';
+import { Image } from 'astro:assets';
 
-const { blok } = Astro.props
+const { blok } = Astro.props;
 
 // Funzione per determinare se il link è interno
 function isInternalLink(url) {
@@ -11,37 +12,34 @@ function isInternalLink(url) {
 // Normalizza il link in base a se è interno o esterno
 const linkUrl = blok.link.cached_url || '/';
 const isInternal = isInternalLink(linkUrl);
+
+// Testo alternativo basato sul nome del blocco
+const altText = blok.image.alt || `Related to ${blok.name}`;
 ---
 
 <div
   {...storyblokEditable(blok)}
-  class="w-full bg-[#f7f6fd] rounded-[5px] text-center overflow-hidden"
+  class="w-full bg-[#f7f6fd] rounded-[5px] text-center overflow-visible"
 >
-  {isInternal ? (
-    <a href={`/${linkUrl}`} target="_self">
-      <img
+  <a href={isInternal ? `/${linkUrl}` : blok.link.url} target={isInternal ? "_self" : "_blank"} rel={!isInternal ? "noopener noreferrer" : undefined}>
+      {blok.image.filename && (
+      <Image
         src={blok.image.filename}
-        alt={blok.image.alt}
+        alt={altText}
         class="w-full h-48 xl:h-72 object-cover"
+        width={800}
+        height={400}
+        format="webp"
+        sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 800px"
+        loading="lazy"
       />
-      <div class="px-12 py-6">
+    )}
+    <div class="px-12 py-6">
+      {blok.name && (
         <h3 class="text-2xl text-[#1d243d] font-bold">
           {blok.name}
         </h3>
-      </div>
-    </a>
-  ) : (
-    <a href={blok.link.url} target="_blank" rel="noopener noreferrer">
-      <img
-        src={blok.image.filename}
-        alt={blok.image.alt}
-        class="w-full h-48 xl:h-72 object-cover"
-      />
-      <div class="px-12 py-6">
-        <h3 class="text-2xl text-[#1d243d] font-bold">
-          {blok.name}
-        </h3>
-      </div>
-    </a>
-  )}
+      )}
+    </div>
+  </a>
 </div>

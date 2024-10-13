@@ -27,6 +27,8 @@ export default defineConfig({
         'popular-articles': 'storyblok/PopularArticles',
         'all-articles': 'storyblok/AllArticles',
         article: 'storyblok/Article',
+        bookpage: 'storyblok/Bookpage',
+        'all-bookpages': 'storyblok/AllBookPages',
         'popular-products': 'storyblok/PopularProducts',
         'all-products': 'storyblok/AllProducts',
         product: 'storyblok/Product',

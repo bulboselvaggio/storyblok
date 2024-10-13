@@ -1,13 +1,26 @@
 ---
-const { article } = Astro.props
+import { Image } from 'astro:assets'; // Importa il componente Image
+
+const { article } = Astro.props;
+const { filename, alt } = article.image || {};
+const imageUrlBase = filename ? filename.split('/m/')[0] : '';
 ---
- 
+
 <article class="column feature bg-gray-100 rounded">
-  <img
-    class="object-cover object-center w-full lg:h-48 md:h-36 rounded"
-    src={`${article.image.filename}/m/360x240`}
-    alt={article.image.alt}
-  />
+  <!-- Usa il componente Image per ottimizzare l'immagine -->
+  {imageUrlBase && (
+    <Image
+      src={`${imageUrlBase}/m/360x240`}
+      alt={alt || article.title}
+      width={360}
+      height={240}
+      class="object-cover object-center w-full lg:h-48 md:h-36 rounded"
+      format="webp"
+      sizes="(max-width: 600px) 100vw, 360px"
+      loading="lazy"
+    />
+  )}
+  
   <div class="p-4">
     <h1 class="text-2xl font-semibold lg:text-3xl">
       {article.title}

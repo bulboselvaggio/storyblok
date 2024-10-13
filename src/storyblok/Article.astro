@@ -1,50 +1,75 @@
 ---
 import { storyblokEditable, useStoryblokApi } from '@storyblok/astro';
-import Navigation from '../components/Navigation.astro'; // Importa il componente di navigazione
+import Navigation from '../components/Navigation.astro';
+import Button from '../components/Button.astro';
+import { Image } from 'astro:assets'; // Importa il componente Image
 
 const { blok } = Astro.props;
 
-// Ottieni lo slug dall'URL
-const currentFullSlug = Astro.url.pathname.replace(/^\/|\/$/g, ''); // Rimuove slash iniziale e finale
+// Funzione per rimuovere lo slash finale
+function normalizeSlug(slug) {
+  return slug.replace(/\/$/, ''); // Rimuove lo slash finale
+}
 
-// Ottieni tutti gli articoli con la stessa categoria dell'articolo corrente
+const currentFullSlug = normalizeSlug(Astro.url.pathname.replace(/^\/|\/$/g, ''));
 let storyblokApi;
 let articles = [];
 let previousArticle = null;
 let nextArticle = null;
+let firstPageSlug = null;
+let bookPages = [];
 
 try {
   storyblokApi = useStoryblokApi();
-  const { data } = await storyblokApi.get(`cdn/stories`, {
-    version: 'draft', // or 'published'
-    starts_with: blok.category === 'book' ? 'books/' : 'blog/', // Filtra per categoria (books o blog)
-    is_startpage: 0,
+
+  // Filtra solo le root dei libri per la navigazione (is_startpage: 1)
+  const { data: articlesData } = await storyblokApi.get(`cdn/stories`, {
+    version: 'draft',
+    starts_with: blok.category === 'book' ? 'books/' : 'blog/',
+    is_startpage: blok.category === 'book' ? 1 : 0,
   });
 
-  // Filtra articoli con data e slug valido e della stessa categoria
-  articles = data.stories
-    .filter(article => article.content.date && article.full_slug && article.content.category === blok.category) // Aggiunge il filtro per la categoria
+  // Ordina le storie per data
+  articles = articlesData.stories
+    .filter(article => article.content.date && article.full_slug && article.content.category === blok.category)
     .sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
 
-  // Trova l'indice dell'articolo corrente usando `full_slug`
-  const currentIndex = articles.findIndex(article => article.full_slug === currentFullSlug);
+  // Trova l'indice dell'articolo corrente con slug normalizzati
+  const currentIndex = articles.findIndex(article => {
+    const normalizedArticleSlug = normalizeSlug(article.full_slug);
+    return normalizedArticleSlug === currentFullSlug;
+  });
 
   if (currentIndex !== -1) {
-    // Assegna l'articolo precedente e successivo se esistono
     previousArticle = currentIndex < articles.length - 1 ? articles[currentIndex + 1] : null;
     nextArticle = currentIndex > 0 ? articles[currentIndex - 1] : null;
   }
+
+  // Recupero delle pagine del libro corrente
+  if (blok.category === 'book') {
+    const bookSlug = articles[currentIndex]?.slug || blok.slug;
+    const bookUuid = articles[currentIndex]?.uuid || blok.uuid;
+
+    if (bookSlug && bookUuid) {
+      const { data: pagesData } = await storyblokApi.get(`cdn/stories`, {
+        version: 'draft',
+        starts_with: `books/${bookSlug}/`,
+        is_startpage: 0,
+      });
+
+      const bookPages = pagesData.stories.filter(page => page.content.bookreference === bookUuid);
+
+      if (bookPages.length > 0) {
+        const sortedPages = bookPages
+          .filter(page => page.content.pagenumber)
+          .sort((a, b) => parseInt(a.content.pagenumber) - parseInt(b.content.pagenumber));
+
+        firstPageSlug = sortedPages.length > 0 ? sortedPages[0].full_slug : null;
+      }
+    }
+  }
 } catch (error) {
   console.error("Error fetching stories from Storyblok:", error);
-}
-
-// Funzione per estrarre il numero dal nome del file e ordinare le immagini
-function sortImagesByFilename(images) {
-  return images.sort((a, b) => {
-    const numA = parseInt(a.filename.match(/(\d+)/)?.[0], 10);
-    const numB = parseInt(b.filename.match(/(\d+)/)?.[0], 10);
-    return numA - numB;
-  });
 }
 
 // Funzione per estrarre larghezza e altezza dall'URL
@@ -57,13 +82,13 @@ function extractDimensionsFromURL(url) {
   };
 }
 
+// Funzione per ordinare le immagini
 const sortedImages = Array.isArray(blok.images) && blok.images.length > 0 
-  ? sortImagesByFilename(blok.images)
+  ? blok.images.sort((a, b) => parseInt(a.filename.match(/(\d+)/)?.[0], 10) - parseInt(b.filename.match(/(\d+)/)?.[0], 10))
   : [];
 ---
 
 <style>
-  /* Stili per il lightbox */
   .pswp img {
     max-width: 90%;
     max-height: 90vh;
@@ -71,32 +96,44 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
     margin: auto;
   }
 
-  /* Margine interno al contenitore per evitare che tocchi il bordo */
   .gallery-item {
-    padding: 0 15px; /* Uniforma il padding laterale */
+    padding: 0 15px;
   }
 
-  /* Assicura che l'immagine non provochi scrolling orizzontale */
   .gallery-item img {
     width: 100%;
     height: auto;
     object-fit: contain;
   }
 
-  /* Padding e margine coerenti con la pagina prodotto */
   article {
-    padding: 0 20px; /* Aggiusta il padding a destra e sinistra per renderlo simile al prodotto */
+    padding: 0 20px;
   }
 
-  /* Gestione dei margini specifica per mobile */
   @media (max-width: 768px) {
     .gallery-item {
-      padding: 0 10px; /* Riduce il padding interno su mobile */
+      padding: 0 10px;
     }
 
     article {
-      padding: 0 15px; /* Riduce il padding laterale su mobile per mantenere coerenza */
+      padding: 0 15px;
     }
+  }
+
+  .black-button {
+    background-color: black;
+    color: white;
+    border: none;
+  }
+
+  .black-button:hover {
+    background-color: black;
+    color: #f0f0f0;
+  }
+
+  .cta-container {
+    margin-top: 2rem;
+    text-align: center;
   }
 </style>
 
@@ -104,7 +141,7 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
   <h1 class="text-center text-5xl font-bold mb-4">{blok.title}</h1>
   <p class="text-center text-xl text-gray-700 mb-8">{blok.teaser}</p>
 
-  <!-- Galleria con layout Tailwind CSS -->
+  <!-- Galleria di immagini -->
   <div id="my-gallery" class="grid grid-cols-1 gap-8">
     {sortedImages.length > 0 ? (
       sortedImages.map((image, index) => {
@@ -120,7 +157,7 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
             href={`${imageUrlBase}/m/1600x0`}
             data-pswp-width={width}
             data-pswp-height={height}
-            data-pswp-srcset={`
+            data-pswp-srcset={` 
               ${imageUrlBase}/m/700x0 700w,
               ${imageUrlBase}/m/1000x0 1000w,
               ${imageUrlBase}/m/1600x0 1600w
@@ -139,10 +176,15 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
                 type="image/webp"
                 media="(max-width: 768px)"
               />
-              <img 
+              <Image 
                 src={`${imageUrlBase}/m/800x0`} 
                 alt={imageAlt}
+                width={width}
+                height={height}
+                format="webp"
+                sizes="(max-width: 600px) 100vw, 50vw"
                 class="cursor-pointer w-full max-w-screen-md thumb"
+                loading="eager"
               />
             </picture>
             {image.title && (
@@ -157,6 +199,22 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
       <p>No images available.</p>
     )}
   </div>
+
+  <!-- Mostra il contenuto del libro -->
+  {blok.content?.content?.map((block, index) => (
+    <div key={index} class="book-content">
+      {block.content?.map((paragraph, pIndex) => (
+        <p key={pIndex} class="text-gray-800">{paragraph.text}</p>
+      ))}
+    </div>
+  ))}
+
+  <!-- Pulsante per iniziare a leggere il libro -->
+  {blok.category === 'book' && firstPageSlug && (
+    <div class="cta-container">
+      <Button href={`/${firstPageSlug}`} label="Start reading" extraClasses="cta-button" />
+    </div>
+  )}
 
   <!-- Navigazione tra articoli -->
   <Navigation 

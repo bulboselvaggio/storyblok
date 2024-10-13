@@ -1,0 +1,54 @@
+---
+import { useStoryblokApi } from '@storyblok/astro';
+
+const storyblokApi = useStoryblokApi();
+const slug = 'books/un-al-giorno';
+let bookPages = [];
+let logData = '';
+
+try {
+  // Primo tentativo: Otteniamo le storie che iniziano con lo slug specifico
+  const { data } = await storyblokApi.get(`cdn/stories`, {
+    version: 'draft',
+    starts_with: slug,
+    is_startpage: 0,
+  });
+
+  // Log dei dati ricevuti
+  logData = JSON.stringify(data.stories, null, 2);
+
+  // Filtriamo le pagine in base al 'bookreference' o parent_id
+  bookPages = data.stories.filter(story => story.content.bookreference === '0ba230ce-dd58-4f82-9e58-b6d85892a21d' || story.parent_id === 558966866);
+
+  if (bookPages.length === 0) {
+    // Se non ci sono pagine filtrate, proviamo con un'altra logica
+    bookPages = data.stories.filter(story => story.content.category === 'book');
+  }
+
+  // Ordiniamo le pagine per numero di pagina, se disponibile
+  bookPages = bookPages.sort((a, b) => parseInt(a.content.pagenumber) - parseInt(b.content.pagenumber));
+
+} catch (error) {
+  logData = `Errore nel recuperare le pagine: ${error.message}`;
+}
+
+---
+<div>
+  <h2>Book Pages for "Un Al Giorno"</h2>
+  {bookPages.length > 0 ? (
+    <ul>
+      {bookPages.map(page => (
+        <li key={page.uuid}>
+          <a href={`/${page.full_slug}`}>
+            {page.name} - Slug: {page.full_slug}
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No pages found.</p>
+  )}
+
+  <h3>Log dei dati recuperati:</h3>
+  <pre>{logData}</pre>
+</div>

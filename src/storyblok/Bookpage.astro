@@ -1,0 +1,143 @@
+---
+import { storyblokEditable, useStoryblokApi } from '@storyblok/astro';
+import Navigation from '../components/Navigation.astro'; // Importa il componente di navigazione
+import Breadcrumb from '../components/Breadcrumb.astro'; // Importa il componente Breadcrumb
+import { Image } from 'astro:assets'; // Importa il componente Image
+
+const { blok } = Astro.props;
+
+const currentFullSlug = Astro.url.pathname.replace(/^\/|\/$/g, ''); // Rimuove slash iniziale e finale
+
+let storyblokApi;
+let bookPages = [];
+let previousPage = null;
+let nextPage = null;
+let currentIndex = -1;
+let bookTitle = ''; // Variabile per il titolo del libro
+
+try {
+  storyblokApi = useStoryblokApi();
+  const bookSlug = currentFullSlug.split('/')[1]; // Prende "un-al-giorno" dallo slug completo
+
+  const { data: bookData } = await storyblokApi.get(`cdn/stories/books/${bookSlug}`, {
+    version: 'draft',
+  });
+
+  if (bookData && bookData.story) {
+    bookTitle = bookData.story.name;
+  }
+
+  const { data } = await storyblokApi.get(`cdn/stories`, {
+    version: 'draft',
+    starts_with: `books/${bookSlug}/`,
+    is_startpage: 0,
+  });
+
+  bookPages = data.stories
+    .filter(page => page.full_slug && page.content.bookreference === blok.bookreference)
+    .sort((a, b) => parseInt(a.content.pagenumber) - parseInt(b.content.pagenumber));
+
+  currentIndex = bookPages.findIndex(page => page.full_slug === currentFullSlug);
+
+  if (currentIndex !== -1) {
+    previousPage = currentIndex > 0 ? bookPages[currentIndex - 1] : null;
+    nextPage = currentIndex < bookPages.length - 1 ? bookPages[currentIndex + 1] : null;
+  }
+} catch (error) {
+  console.error("Error fetching pages or book data from Storyblok:", error);
+}
+
+const { width, height } = (() => {
+  const dimensionString = blok.image.filename.split('/')[5];
+  const dimensions = dimensionString.split('x');
+  return {
+    width: dimensions[0],
+    height: dimensions[1]
+  };
+})();
+---
+
+<style>
+  .pswp img {
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+    margin: auto;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .gallery-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  article {
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    article {
+      padding: 0 15px;
+    }
+  }
+</style>
+
+<article {...storyblokEditable(blok)} class="flex flex-col my-12">
+  <!-- Usa il componente Breadcrumb -->
+  <Breadcrumb bookTitle={bookTitle} currentFullSlug={currentFullSlug} />
+
+  <!-- Mostra il titolo della pagina solo se esiste, con stile simile a article.astro -->
+  {blok.title && (
+    <h1 class="text-center text-5xl font-bold mb-4">{blok.title}</h1>
+  )}
+
+  <!-- Immagine della pagina centrata, usando il componente Image di Astro -->
+  <div class="gallery-container">
+    <div id="my-gallery" class="grid grid-cols-1 gap-8">
+      <a
+        href={`${blok.image.filename.split('/m/')[0]}/m/1600x0`}
+        data-pswp-width={width}
+        data-pswp-height={height}
+        class="relative gallery-item"
+      >
+        <Image
+          src={`${blok.image.filename.split('/m/')[0]}/m/800x0`}
+          alt={blok.image.alt || blok.title}
+          width={width}
+          height={height}
+          class="cursor-pointer w-full max-w-screen-md thumb"
+          format="webp"
+          sizes="(max-width: 600px) 100vw, 50vw"
+          loading="eager"
+        />
+      </a>
+    </div>
+  </div>
+
+  <Navigation 
+    previousItem={previousPage ? { name: previousPage.content.title, url: `/${previousPage.full_slug}` } : null} 
+    nextItem={nextPage ? { name: nextPage.content.title, url: `/${nextPage.full_slug}` } : null} 
+  />
+</article>
+
+<script>
+  import 'photoswipe/style.css';
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+  import PhotoSwipe from 'photoswipe';
+
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '#my-gallery',
+    children: 'a',
+    pswpModule: PhotoSwipe
+  });
+
+  lightbox.init();
+</script>

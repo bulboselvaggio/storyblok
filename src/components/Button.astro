@@ -1,6 +1,6 @@
 ---
 // src/components/Button.astro
-const { href, label, extraClasses = '' } = Astro.props
+const { href, label, extraClasses = '' } = Astro.props;
 ---
 
 <a
@@ -9,3 +9,27 @@ const { href, label, extraClasses = '' } = Astro.props
 >
   {label}
 </a>
+
+<style>
+  .black-button {
+    background-color: black;
+    color: white;
+    border-color: black; /* Nessun bordo bianco */
+  }
+
+  .black-button:hover {
+    background-color: white;
+    color: black;
+  }
+
+  .cta-button {
+    background-color: black;
+    color: white; /* Mantieni il testo bianco */
+    border: none; /* Rimuovi il bordo */
+  }
+
+  .cta-button:hover {
+    background-color: #333; /* Colore in hover */
+    color: white; /* Testo sempre bianco */
+  }
+</style>

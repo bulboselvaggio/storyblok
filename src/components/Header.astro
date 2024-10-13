@@ -86,7 +86,7 @@ const headerMenu = data?.story?.content?.header_menu;
 document.addEventListener('DOMContentLoaded', function () {
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobile-menu');
-  const svgContainer = document.getElementById('milfoski-svg');
+  const svgContainer = document.getElementById('milfoski-svg') as HTMLImageElement;
   let menuOpen = false;
 
   // Lazy load SVG when the menu is opened
@@ -141,9 +141,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (cartItems > 0) {
       cartBadge.style.display = 'flex';
-      cartBadge.textContent = cartItems;
+      cartBadge.textContent = cartItems.toString();
       cartBadgeDesktop.style.display = 'flex';
-      cartBadgeDesktop.textContent = cartItems;
+      cartBadgeDesktop.textContent = cartItems.toString();
     } else {
       cartBadge.style.display = 'none';
       cartBadgeDesktop.style.display = 'none';
@@ -188,13 +188,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Timeout di fallback
       const fallbackTimeout = setTimeout(() => {
-        window.location.href = link.href;  // Redirect se il caricamento è troppo lento
+        const anchor = link as HTMLAnchorElement;
+        window.location.href = anchor.href;  // Redirect se il caricamento è troppo lento
       }, 250);  // Timeout
 
       // Aspetta che l'SVG si carichi
       svgContainer.onload = function () {
         clearTimeout(fallbackTimeout);  // Cancella il timeout se il caricamento avviene in tempo
-        window.location.href = link.href;  // Esegui il redirect dopo il caricamento
+        const anchor = link as HTMLAnchorElement;
+        window.location.href = anchor.href;  // Esegui il redirect dopo il caricamento
       };
     });
   });

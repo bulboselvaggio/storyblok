@@ -32,7 +32,7 @@ try {
   // Ordina le storie per data
   articles = articlesData.stories
     .filter(article => article.content.date && article.full_slug && article.content.category === blok.category)
-    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
+    .sort((a, b) => new Date(b.content.date).getTime() - new Date(a.content.date).getTime());
 
   // Trova l'indice dell'articolo corrente con slug normalizzati
   const currentIndex = articles.findIndex(article => {
@@ -62,7 +62,7 @@ try {
       if (bookPages.length > 0) {
         const sortedPages = bookPages
           .filter(page => page.content.pagenumber)
-          .sort((a, b) => parseInt(a.content.pagenumber) - parseInt(b.content.pagenumber));
+          .sort((a, b) => parseInt(a.content.pagenumber, 10) - parseInt(b.content.pagenumber, 10)); // Conversione in numero
 
         firstPageSlug = sortedPages.length > 0 ? sortedPages[0].full_slug : null;
       }
@@ -84,7 +84,7 @@ function extractDimensionsFromURL(url) {
 
 // Funzione per ordinare le immagini
 const sortedImages = Array.isArray(blok.images) && blok.images.length > 0 
-  ? blok.images.sort((a, b) => parseInt(a.filename.match(/(\d+)/)?.[0], 10) - parseInt(b.filename.match(/(\d+)/)?.[0], 10))
+  ? blok.images.sort((a, b) => parseInt(a.filename.match(/(\d+)/)?.[0], 10) - parseInt(b.filename.match(/(\d+)/)?.[0], 10)) 
   : [];
 ---
 
@@ -152,27 +152,25 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
         const { width, height } = extractDimensionsFromURL(image.filename);
 
         return (
-          <a
-            key={index}
-            href={`${imageUrlBase}/m/1600x0`}
-            data-pswp-width={width}
-            data-pswp-height={height}
-            data-pswp-srcset={` 
-              ${imageUrlBase}/m/700x0 700w,
-              ${imageUrlBase}/m/1000x0 1000w,
-              ${imageUrlBase}/m/1600x0 1600w
-            `}
-            sizes="(max-width: 768px) 700px, (max-width: 1024px) 1000px, 1600px"
-            class="relative gallery-item"
-          >
+        <a
+          href={`${imageUrlBase}/m/1600x0`}
+          data-pswp-width={width}
+          data-pswp-height={height}
+          data-pswp-srcset={` 
+            ${imageUrlBase}/m/700x0 700w,
+            ${imageUrlBase}/m/1000x0 1000w,
+            ${imageUrlBase}/m/1600x0 1600w
+          `}
+          class="relative gallery-item"
+        >
             <picture>
               <source
-                srcSet={`${imageUrlBase}/m/500x0/filters:format(avif)`}
+                srcset={`${imageUrlBase}/m/500x0/filters:format(avif)`}
                 type="image/avif"
                 media="(max-width: 768px)"
               />
               <source
-                srcSet={`${imageUrlBase}/m/500x0/filters:format(webp)`}
+                srcset={`${imageUrlBase}/m/500x0/filters:format(webp)`}
                 type="image/webp"
                 media="(max-width: 768px)"
               />
@@ -201,10 +199,10 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
   </div>
 
   <!-- Mostra il contenuto del libro -->
-  {blok.content?.content?.map((block, index) => (
-    <div key={index} class="book-content">
+  {blok.content?.content?.map((block) => (
+    <div class="book-content">
       {block.content?.map((paragraph, pIndex) => (
-        <p key={pIndex} class="text-gray-800">{paragraph.text}</p>
+        <p class="text-gray-800">{paragraph.text}</p>
       ))}
     </div>
   ))}

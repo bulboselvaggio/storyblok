@@ -17,9 +17,9 @@ const headerMenu = data?.story?.content?.header_menu;
 
     <!-- Mobile cart and hamburger -->
     <div class="flex lg:hidden items-center space-x-4 relative">
-      <button id="cart-button" class="snipcart-checkout relative">
+      <button id="cart-button" class="snipcart-checkout relative disabled" disabled>
         <!-- Updated Cart Icon (shopping bag) -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black transition-colors duration-300 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors duration-300 text-gray-400 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" fill="currentColor"></path>
         </svg>
         <!-- Badge for item count -->
@@ -49,8 +49,8 @@ const headerMenu = data?.story?.content?.header_menu;
         }
       </ul>
       <!-- Cart Button for Desktop -->
-      <button id="cart-button-desktop" class="snipcart-checkout relative">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black transition-colors duration-300 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
+      <button id="cart-button-desktop" class="snipcart-checkout relative disabled" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors duration-300 text-gray-400 hover:text-[#50b0ae]" fill="none" viewBox="0 0 64 64" stroke="currentColor">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M51.714 20.47L55 60H9l3.286-39.53h9.857v-6.588C22.143 8.424 26.556 4 32 4c5.444 0 9.857 4.424 9.857 9.882v6.589h9.857zM25.43 13.883v16.47h-3.286v-6.587H15.31l-2.737 32.94h38.856l-2.737-32.94h-6.834v6.588h-3.286v-16.47c0-3.634-2.947-6.589-6.571-6.589-3.624 0-6.571 2.955-6.571 6.588zm3.285 9.883V20.47h6.572v3.294h-6.572z" fill="currentColor"></path>
         </svg>
         <!-- Badge for item count -->
@@ -79,160 +79,223 @@ const headerMenu = data?.story?.content?.header_menu;
   </div>
 </header>
 
-  </div>
-</header>
-
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const svgContainer = document.getElementById('milfoski-svg') as HTMLImageElement;
-  let menuOpen = false;
+  document.addEventListener('DOMContentLoaded', function () {
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const svgContainer = document.getElementById('milfoski-svg') as HTMLImageElement;
+    const cartButton = document.getElementById('cart-button') as HTMLButtonElement;
+    const cartButtonDesktop = document.getElementById('cart-button-desktop') as HTMLButtonElement;
+    let menuOpen = false;
 
-  // Lazy load SVG when the menu is opened
-  function lazyLoadSVG() {
-    if (svgContainer.dataset.src) {
-      svgContainer.src = svgContainer.dataset.src;
-      svgContainer.removeAttribute('data-src');
-    }
-  }
-
-  // Toggle menu and animate hamburger icon
-  hamburger?.addEventListener('click', function () {
-    menuOpen = !menuOpen;
-    if (menuOpen) {
-      mobileMenu.classList.remove('-translate-x-full');
-      mobileMenu.classList.add('translate-x-0');
-      lazyLoadSVG();  // Carica l'SVG quando il menu è aperto
-    } else {
-      mobileMenu.classList.remove('translate-x-0');
-      mobileMenu.classList.add('-translate-x-full');
+    // Lazy load SVG when the menu is opened
+    function lazyLoadSVG() {
+      if (svgContainer.dataset.src) {
+        svgContainer.src = svgContainer.dataset.src;
+        svgContainer.removeAttribute('data-src');
+      }
     }
 
-    const line1 = document.getElementById('line1');
-    const line2 = document.getElementById('line2');
-    const line3 = document.getElementById('line3');
+    // Toggle menu and animate hamburger icon
+    hamburger?.addEventListener('click', function () {
+      menuOpen = !menuOpen;
+      if (menuOpen) {
+        mobileMenu.classList.remove('-translate-x-full');
+        mobileMenu.classList.add('translate-x-0');
+        lazyLoadSVG();  // Carica l'SVG quando il menu è aperto
+      } else {
+        mobileMenu.classList.remove('translate-x-0');
+        mobileMenu.classList.add('-translate-x-full');
+      }
 
-    if (menuOpen) {
-      line1.style.transform = 'rotate(45deg) translateY(8px)';
-      line2.style.opacity = '0';
-      line3.style.transform = 'rotate(-45deg) translateY(-8px)';
-    } else {
-      line1.style.transform = '';
-      line2.style.opacity = '1';
-      line3.style.transform = '';
-    }
-  });
+      const line1 = document.getElementById('line1');
+      const line2 = document.getElementById('line2');
+      const line3 = document.getElementById('line3');
 
-  // Function to open Snipcart cart if available
-  function openSnipcartCart() {
-    if (window.Snipcart?.api?.modal) {
-      window.Snipcart.api.modal.show();
-    } else {
-      setTimeout(openSnipcartCart, 500);
-    }
-  }
-
-  // Badge visibility logic
-  function updateCartCount() {
-    const cartBadge = document.getElementById('cart-badge');
-    const cartBadgeDesktop = document.getElementById('cart-badge-desktop');
-    const cartItems = window.Snipcart.store.getState().cart.items.count;
-
-    if (cartItems > 0) {
-      cartBadge.style.display = 'flex';
-      cartBadge.textContent = cartItems.toString();
-      cartBadgeDesktop.style.display = 'flex';
-      cartBadgeDesktop.textContent = cartItems.toString();
-    } else {
-      cartBadge.style.display = 'none';
-      cartBadgeDesktop.style.display = 'none';
-    }
-  }
-
-  // Ensure Snipcart is fully loaded before the cart button works
-  document.addEventListener('snipcart.ready', () => {
-    const cartButtons = document.querySelectorAll('.snipcart-checkout');
-    cartButtons.forEach(button => {
-      button.addEventListener('click', function () {
-        openSnipcartCart();
-      });
+      if (menuOpen) {
+        line1.style.transform = 'rotate(45deg) translateY(8px)';
+        line2.style.opacity = '0';
+        line3.style.transform = 'rotate(-45deg) translateY(-8px)';
+      } else {
+        line1.style.transform = '';
+        line2.style.opacity = '1';
+        line3.style.transform = '';
+      }
     });
 
-    // Update the cart count badge when the cart is updated
-    window.Snipcart.store.subscribe(() => {
+    // Function to open Snipcart cart if available
+    function openSnipcartCart() {
+      if (window.Snipcart?.api?.modal) {
+        window.Snipcart.api.modal.show();
+      } else {
+        setTimeout(openSnipcartCart, 500);
+      }
+    }
+
+    // Badge visibility logic
+    function updateCartCount() {
+      const cartBadge = document.getElementById('cart-badge');
+      const cartBadgeDesktop = document.getElementById('cart-badge-desktop');
+      const cartItems = window.Snipcart.store.getState().cart.items.count;
+
+      if (cartItems > 0) {
+        cartBadge.style.display = 'flex';
+        cartBadge.textContent = cartItems.toString();
+        cartBadgeDesktop.style.display = 'flex';
+        cartBadgeDesktop.textContent = cartItems.toString();
+      } else {
+        cartBadge.style.display = 'none';
+        cartBadgeDesktop.style.display = 'none';
+      }
+    }
+
+    // Funzione per abilitare i pulsanti del carrello
+    function enableCartButtons() {
+      cartButton.disabled = false;
+      cartButton.classList.add('enabled');
+      cartButton.classList.remove('disabled');
+      cartButton.querySelector('svg')?.classList.remove('text-gray-400');
+      cartButton.querySelector('svg')?.classList.add('text-black');
+
+      cartButtonDesktop.disabled = false;
+      cartButtonDesktop.classList.add('enabled');
+      cartButtonDesktop.classList.remove('disabled');
+      cartButtonDesktop.querySelector('svg')?.classList.remove('text-gray-400');
+      cartButtonDesktop.querySelector('svg')?.classList.add('text-black');
+    }
+
+    // Funzione per disabilitare i pulsanti del carrello
+    function disableCartButtons() {
+      cartButton.disabled = true;
+      cartButton.classList.add('disabled');
+      cartButton.classList.remove('enabled');
+      cartButton.querySelector('svg')?.classList.add('text-gray-400');
+      cartButton.querySelector('svg')?.classList.remove('text-black');
+
+      cartButtonDesktop.disabled = true;
+      cartButtonDesktop.classList.add('disabled');
+      cartButtonDesktop.classList.remove('enabled');
+      cartButtonDesktop.querySelector('svg')?.classList.add('text-gray-400');
+      cartButtonDesktop.querySelector('svg')?.classList.remove('text-black');
+    }
+
+    // Simula l'abilitazione quando Snipcart è pronto
+    document.addEventListener('snipcart.ready', () => {
+      enableCartButtons(); // Abilita i pulsanti carrello
+      const cartButtons = document.querySelectorAll('.snipcart-checkout');
+      cartButtons.forEach(button => {
+        button.addEventListener('click', function () {
+          openSnipcartCart();
+        });
+      });
+
+      // Update the cart count badge when the cart is updated
+      window.Snipcart.store.subscribe(() => {
+        updateCartCount();
+      });
+
+      // Initialize the badge on page load
       updateCartCount();
     });
 
-    // Initialize the badge on page load
-    updateCartCount();
-  });
+    // Disable buttons until Snipcart is ready
+    disableCartButtons();
 
-  // Hover functionality to change Milfoski face on mobile (click only)
-  const navLinks = document.querySelectorAll('#mobile-menu ul li a');
+    // Hover functionality to change Milfoski face on mobile (click only)
+    const navLinks = document.querySelectorAll('#mobile-menu ul li a');
 
-  // Cambia l'SVG e aspetta il caricamento prima di seguire il link
-  navLinks.forEach((link, index) => {
-    const svgUrls = [
-      'https://a.storyblok.com/f/297215/212x259/fcf5838be0/milfoski-nav0.svg',
-      'https://a.storyblok.com/f/297215/212x265/9275b49a10/milfoski-nav1.svg',
-      'https://a.storyblok.com/f/297215/212x272/63ae304c01/milfoski-nav2.svg',
-      'https://a.storyblok.com/f/297215/212x259/0d84069775/milfoski-nav3.svg'
-    ];
+    // Cambia l'SVG e aspetta il caricamento prima di seguire il link
+    navLinks.forEach((link, index) => {
+      const svgUrls = [
+        'https://a.storyblok.com/f/297215/212x259/fcf5838be0/milfoski-nav0.svg',
+        'https://a.storyblok.com/f/297215/212x265/9275b49a10/milfoski-nav1.svg',
+        'https://a.storyblok.com/f/297215/212x272/63ae304c01/milfoski-nav2.svg',
+        'https://a.storyblok.com/f/297215/212x259/0d84069775/milfoski-nav3.svg'
+      ];
 
-    link.addEventListener('click', (event) => {
-      event.preventDefault();  // Blocca il comportamento predefinito del link
+      link.addEventListener('click', (event) => {
+        event.preventDefault();  // Blocca il comportamento predefinito del link
 
-      // Cambia SVG
-      svgContainer.src = svgUrls[index + 1];
+        // Cambia SVG
+        svgContainer.src = svgUrls[index + 1];
 
-      // Timeout di fallback
-      const fallbackTimeout = setTimeout(() => {
-        const anchor = link as HTMLAnchorElement;
-        window.location.href = anchor.href;  // Redirect se il caricamento è troppo lento
-      }, 250);  // Timeout
+        // Timeout di fallback
+        const fallbackTimeout = setTimeout(() => {
+          const anchor = link as HTMLAnchorElement;
+          window.location.href = anchor.href;  // Redirect se il caricamento è troppo lento
+        }, 250);  // Timeout
 
-      // Aspetta che l'SVG si carichi
-      svgContainer.onload = function () {
-        clearTimeout(fallbackTimeout);  // Cancella il timeout se il caricamento avviene in tempo
-        const anchor = link as HTMLAnchorElement;
-        window.location.href = anchor.href;  // Esegui il redirect dopo il caricamento
-      };
+        // Aspetta che l'SVG si carichi
+        svgContainer.onload = function () {
+          clearTimeout(fallbackTimeout);  // Cancella il timeout se il caricamento avviene in tempo
+          const anchor = link as HTMLAnchorElement;
+          window.location.href = anchor.href;  // Esegui il redirect dopo il caricamento
+        };
+      });
     });
   });
-});
 </script>
 
-
 <style>
-#mobile-menu {
-  transition: transform 0.3s ease-in-out;
-}
+  #mobile-menu {
+    transition: transform 0.3s ease-in-out;
+  }
 
-#cart-badge, #cart-badge-desktop {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: #e3342f;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: bold;
-  width: 20px;
-  height: 20px;
-  display: none; /* Il badge è nascosto di default */
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  pointer-events: none;
-}
+  #cart-badge, #cart-badge-desktop {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #e3342f;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    display: none; /* Il badge è nascosto di default */
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    pointer-events: none;
+  }
 
-#milfoski-svg-container {
-  width: 100%;
-  text-align: center;
-}
+  #milfoski-svg-container {
+    width: 100%;
+    text-align: center;
+  }
 
-#milfoski-svg {
-  width: 100%;
-}
+  #milfoski-svg {
+    width: 100%;
+  }
 
+  /* Stile per pulsanti disabilitati */
+  button.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  button.disabled:hover {
+    color: inherit; /* Nessun effetto hover quando disabilitato */
+  }
+
+  /* Stile quando i pulsanti sono abilitati */
+  button.enabled {
+    cursor: pointer;
+    opacity: 1;
+  }
+
+  /* Assicurati che l'icona del carrello sia inizialmente nera */
+  .snipcart-checkout svg {
+    transition: fill 0.3s ease-in-out;
+    fill: black; /* Icona di default nera */
+  }
+
+  /* Effetto hover per l'icona del carrello abilitata */
+  .snipcart-checkout:hover svg {
+    fill: #50b0ae !important; /* Colore di hover verde acqua */
+  }
+
+  /* Hover per le voci di menu */
+  nav a:hover {
+    color: #50b0ae;
+  }
 </style>

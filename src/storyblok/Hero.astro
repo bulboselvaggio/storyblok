@@ -9,7 +9,7 @@ const storyblokApi = useStoryblokApi();
 const { data } = await storyblokApi.get(`cdn/stories`, {
   version: 'draft', // or 'published'
   starts_with: 'blog/',
-  is_startpage: 0,
+  is_startpage: false,
 });
 
 // Ottieni l'elenco degli articoli
@@ -19,7 +19,7 @@ const articles = data.stories || [];
 function getMostRecentArticle(articles) {
   return articles
     .filter(article => article.content.date) // Filtra gli articoli con 'date' valorizzata
-    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date))[0];
+    .sort((a, b) => +new Date(b.content.date) - +new Date(a.content.date))[0];
 }
 
 const recentArticle = getMostRecentArticle(articles);
@@ -57,22 +57,22 @@ let dynamicHeroClass = blok.layout === 'constrained' ? 'container mx-auto' : '';
   <!-- Usa il tag picture per servire formati AVIF e WebP -->
   <picture>
     <source
-      srcSet={`${recentImage || fallbackImage}/m/500x750/filters:format(avif)`}
+      srcset={`${recentImage || fallbackImage}/m/500x750/filters:format(avif)`}
       type="image/avif"
       media="(max-width: 768px)"
     />
     <source
-      srcSet={`${recentImage || fallbackImage}/m/500x750/filters:format(webp)`}
+      srcset={`${recentImage || fallbackImage}/m/500x750/filters:format(webp)`}
       type="image/webp"
       media="(max-width: 768px)"
     />
     <source
-      srcSet={`${recentImage || fallbackImage}/m/1000x0/filters:format(avif)`}
+      srcset={`${recentImage || fallbackImage}/m/1000x0/filters:format(avif)`}
       type="image/avif"
       media="(max-width: 1024px)"
     />
     <source
-      srcSet={`${recentImage || fallbackImage}/m/1000x0/filters:format(webp)`}
+      srcset={`${recentImage || fallbackImage}/m/1000x0/filters:format(webp)`}
       type="image/webp"
       media="(max-width: 1024px)"
     />
@@ -83,7 +83,7 @@ let dynamicHeroClass = blok.layout === 'constrained' ? 'container mx-auto' : '';
       class="absolute top-0 left-0 z-0 w-full h-full object-cover"
       width={1600}
       height={900}
-      loading="eager" <!-- Cambiato da lazy a eager -->
+      loading="eager"
     />
   </picture>
 </div>

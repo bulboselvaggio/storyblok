@@ -109,36 +109,36 @@ function extractDimensionsFromURL(url) {
   lightbox.init();
 
   // Gestione della selezione della taglia e attivazione del pulsante Add to Cart
-  const sizeInputs = document.querySelectorAll('.size-input');
-  const addButton = document.querySelector('.snipcart-add-item');
+const sizeInputs = document.querySelectorAll('.size-input') as NodeListOf<HTMLInputElement>;
+const addButton = document.querySelector('.snipcart-add-item') as HTMLButtonElement;
 
-  if (sizeInputs.length > 0 && addButton) {
-    sizeInputs.forEach(input => {
-      input.addEventListener('change', () => {
-        const selectedSize = document.querySelector('.size-input:checked');
-        if (selectedSize) {
-          const selectedSizeValue = selectedSize.dataset.size;
-          addButton.disabled = false;
-          addButton.setAttribute('data-item-custom1-value', selectedSizeValue);
+if (sizeInputs.length > 0 && addButton) {
+  sizeInputs.forEach(input => {
+    input.addEventListener('change', () => {
+      const selectedSize = document.querySelector('.size-input:checked') as HTMLInputElement;
+      if (selectedSize) {
+        const selectedSizeValue = selectedSize.dataset.size;
+        addButton.disabled = false;
+        addButton.setAttribute('data-item-custom1-value', selectedSizeValue || '');
 
-          addButton.style.backgroundColor = '';
-          addButton.style.color = '';
+        addButton.style.backgroundColor = '';
+        addButton.style.color = '';
 
-          const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`);
-          if (selectedSizeButton) {
-            const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
-            const color = getComputedStyle(selectedSizeButton).color;
-            addButton.style.backgroundColor = backgroundColor;
-            addButton.style.color = color;
-          }
-        } else {
-          addButton.disabled = true;
-          addButton.style.backgroundColor = '#ccc';
-          addButton.style.color = '#666';
+        const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`) as HTMLDivElement;
+        if (selectedSizeButton) {
+          const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
+          const color = getComputedStyle(selectedSizeButton).color;
+          addButton.style.backgroundColor = backgroundColor;
+          addButton.style.color = color;
         }
-      });
+      } else {
+        addButton.disabled = true;
+        addButton.style.backgroundColor = '#ccc';
+        addButton.style.color = '#666';
+      }
     });
-  }
+  });
+}
 </script>
 
 <style>

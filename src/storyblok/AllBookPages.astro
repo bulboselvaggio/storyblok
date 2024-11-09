@@ -11,7 +11,7 @@ try {
   const { data } = await storyblokApi.get(`cdn/stories`, {
     version: 'draft',
     starts_with: slug,
-    is_startpage: 0,
+    is_startpage: false,
   });
 
   // Log dei dati ricevuti

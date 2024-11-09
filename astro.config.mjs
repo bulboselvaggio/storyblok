@@ -39,7 +39,9 @@ export default defineConfig({
       },
     }),
     tailwind(),
-    sitemap(),
+    sitemap({
+      filter: (page) => !page.includes('/config'),
+    }),
   ],
   vite: {
     plugins: [mkcert()],

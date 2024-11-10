@@ -62,7 +62,13 @@ const headerMenu = data?.story?.content?.header_menu;
     <div id="mobile-menu" class="transform -translate-x-full fixed top-0 left-0 w-64 bg-[#f7f6fd] h-full z-50 shadow-lg transition-transform duration-300">
       <div class="p-6 pt-12">
         <!-- SVG placeholder, caricato solo quando necessario -->
-        <img id="milfoski-svg" data-src="https://a.storyblok.com/f/297215/212x259/fcf5838be0/milfoski-nav0.svg" alt="Milfoski Face" class="w-full mb-4 lazyload">
+        <img id="milfoski-svg" 
+     data-src="https://a.storyblok.com/f/297215/212x259/fcf5838be0/milfoski-nav0.svg" 
+     alt="Milfoski Face" 
+     class="w-full mb-4 lazyload" 
+     width="212" 
+     height="259">
+
         <ul class="space-y-4 text-lg font-bold text-center">
           {
             headerMenu.map((menu) => (

@@ -1,5 +1,6 @@
 ---
 import { storyblokEditable } from '@storyblok/astro';
+import { Image } from 'astro:assets';
 
 const { blok } = Astro.props;
 
@@ -22,7 +23,28 @@ function extractDimensionsFromURL(url) {
     <div>
       <!-- Immagine principale -->
       <div class="main-image">
-        <img id="main-image" src={blok.image.filename} alt={blok.title} class="w-full object-cover cursor-default" />
+        <picture>
+          <source
+            srcset={`${blok.image.filename.split('/m/')[0]}/m/800x0/filters:format(avif)`}
+            type="image/avif"
+            media="(max-width: 768px)"
+          />
+          <source
+            srcset={`${blok.image.filename.split('/m/')[0]}/m/800x0/filters:format(webp)`}
+            type="image/webp"
+            media="(max-width: 768px)"
+          />
+          <Image 
+            src={`${blok.image.filename.split('/m/')[0]}/m/1200x0`} 
+            alt={blok.title}
+            width={extractDimensionsFromURL(blok.image.filename).width}
+            height={extractDimensionsFromURL(blok.image.filename).height}
+            format="webp"
+            sizes="(max-width: 600px) 100vw, 50vw"
+            class="w-full object-cover cursor-default"
+            loading="eager"
+          />
+        </picture>
       </div>
 
       <!-- Thumbnails -->
@@ -34,7 +56,16 @@ function extractDimensionsFromURL(url) {
           data-pswp-height={extractDimensionsFromURL(blok.image.filename).height} 
           class="thumb w-20 cursor-pointer transition-opacity duration-300 hover:opacity-70"
         >
-          <img src={blok.image.filename} alt={blok.title} />
+          <Image 
+            src={`${blok.image.filename.split('/m/')[0]}/m/200x0`} 
+            alt={blok.title}
+            width={200}
+            height={200}
+            format="webp"
+            sizes="20vw"
+            class="w-full object-cover"
+            loading="eager"
+          />
         </a>
         {blok.thumbnails?.map((thumbnail, index) => (
           <a 
@@ -44,7 +75,16 @@ function extractDimensionsFromURL(url) {
             data-pswp-height={extractDimensionsFromURL(thumbnail.filename).height}
             class="thumb w-20 cursor-pointer transition-opacity duration-300 hover:opacity-70"
           >
-            <img src={thumbnail.filename} alt={blok.title} />
+            <Image 
+              src={`${thumbnail.filename.split('/m/')[0]}/m/200x0`} 
+              alt={blok.title}
+              width={200}
+              height={200}
+              format="webp"
+              sizes="20vw"
+              class="w-full object-cover"
+              loading="eager"
+            />
           </a>
         ))}
       </div>
@@ -193,7 +233,6 @@ if (sizeInputs.length > 0 && addButton) {
 .thumb:hover {
   opacity: 0.7;
 }
-
 
 /* Stili per i dettagli del prodotto */
 .product-details {

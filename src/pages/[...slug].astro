@@ -55,8 +55,8 @@ const seoDescription = story.content.seo_description || seoDefaults.description
 const seoKeywords = story.content.seo_keywords || seoDefaults.keywords
 const ogImage = story.content.seo_facebook_image?.filename || seoDefaults.ogImage
 const twitterImage = story.content.seo_twitter_image?.filename || seoDefaults.twitterImage
-const pageUrl = slug === undefined ? seoDefaults.url : `${seoDefaults.url}/${slug}`
-const canonicalUrl = slug === undefined ? seoDefaults.url : `${seoDefaults.url}/${slug}`
+const pageUrl = slug === undefined ? `${seoDefaults.url}/` : `${seoDefaults.url}/${slug}/`;
+const canonicalUrl = slug === undefined ? `${seoDefaults.url}/` : `${seoDefaults.url}/${slug}/`;
 const ogType = seoDefaults.ogType
 ---
 

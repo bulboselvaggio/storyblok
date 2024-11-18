@@ -16,9 +16,7 @@ export default defineConfig({
       apiOptions: {
         region: '',
       },
-      bridge: {
-        customParent: 'https://app.storyblok.com',
-      },
+      bridge: false,
       components: {
         page: 'storyblok/Page',
         config: 'storyblok/Config',

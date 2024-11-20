@@ -96,7 +96,8 @@ const headerMenu = data?.story?.content?.header_menu;
     const navLinks = document.querySelectorAll<HTMLAnchorElement>('#mobile-menu ul li a');
 
     let menuOpen = false;
-    let snipcartCSSLoaded = false;
+    let snipcartReady = false; // Flag per indicare se Snipcart è pronto
+    let snipcartCSSLoaded = false; // Flag per verificare se il CSS è stato caricato
 
     // URLs degli SVG per le diverse voci di menu
     const svgUrls = [
@@ -120,7 +121,7 @@ const headerMenu = data?.story?.content?.header_menu;
       if (menuOpen) {
         mobileMenu.classList.remove('-translate-x-full');
         mobileMenu.classList.add('translate-x-0');
-        lazyLoadSVG(); // Carica l'SVG quando il menu è aperto
+        lazyLoadSVG();
       } else {
         mobileMenu.classList.remove('translate-x-0');
         mobileMenu.classList.add('-translate-x-full');
@@ -141,36 +142,52 @@ const headerMenu = data?.story?.content?.header_menu;
       }
     });
 
-    // Carica dinamicamente il CSS di Snipcart al primo clic sul pulsante del carrello
-    function loadSnipcartCSS() {
-      if (!snipcartCSSLoaded) {
+    // Funzione per caricare il CSS di Snipcart
+    function loadSnipcartCSS(callback) {
+      if (!snipcartCSSLoaded && !document.getElementById('snipcart-css')) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdn.snipcart.com/themes/v3.2.1/default/snipcart.css';
         link.id = 'snipcart-css';
         document.head.appendChild(link);
-        snipcartCSSLoaded = true;
+
+        link.onload = () => {
+          snipcartCSSLoaded = true; // Segna il CSS come caricato
+          if (callback) callback();
+        };
+      } else if (snipcartCSSLoaded && callback) {
+        callback(); // Esegui immediatamente il callback se già caricato
       }
     }
 
-    // Funzione per aprire Snipcart
+    // Funzione per aprire la modale di Snipcart
     function openSnipcartCart() {
       if (window.Snipcart?.api?.modal) {
         window.Snipcart.api.modal.show();
       } else {
-        setTimeout(openSnipcartCart, 500);
+        document.addEventListener(
+          'snipcart.ready',
+          () => {
+            window.Snipcart.api.modal.show();
+          },
+          { once: true }
+        );
       }
     }
 
     // Gestione click sui pulsanti del carrello
     function handleCartButtonClick() {
-      loadSnipcartCSS(); // Carica il CSS di Snipcart al clic
-      openSnipcartCart(); // Apre il carrello
+      loadSnipcartCSS(() => {
+        if (!snipcartReady && typeof window.Snipcart === 'undefined') {
+          window.LoadSnipcart?.();
+        }
+        openSnipcartCart();
+      });
     }
 
     // Funzione per abilitare i pulsanti del carrello
     function enableCartButtons() {
-      cartButtons.forEach(button => {
+      cartButtons.forEach((button) => {
         button.disabled = false;
         button.classList.add('enabled');
         button.classList.remove('disabled');
@@ -182,7 +199,7 @@ const headerMenu = data?.story?.content?.header_menu;
 
     // Funzione per disabilitare i pulsanti del carrello
     function disableCartButtons() {
-      cartButtons.forEach(button => {
+      cartButtons.forEach((button) => {
         button.disabled = true;
         button.classList.add('disabled');
         button.classList.remove('enabled');
@@ -197,14 +214,14 @@ const headerMenu = data?.story?.content?.header_menu;
       const cartItems = window.Snipcart.store.getState().cart.items.count;
 
       if (cartItems > 0) {
-        [cartBadge, cartBadgeDesktop].forEach(badge => {
+        [cartBadge, cartBadgeDesktop].forEach((badge) => {
           if (badge) {
             badge.style.display = 'flex';
             badge.textContent = cartItems.toString();
           }
         });
       } else {
-        [cartBadge, cartBadgeDesktop].forEach(badge => {
+        [cartBadge, cartBadgeDesktop].forEach((badge) => {
           if (badge) {
             badge.style.display = 'none';
           }
@@ -214,9 +231,10 @@ const headerMenu = data?.story?.content?.header_menu;
 
     // Inizializza Snipcart quando è pronto
     document.addEventListener('snipcart.ready', () => {
+      snipcartReady = true;
       enableCartButtons();
       updateCartCount();
-      window.Snipcart.store.subscribe(updateCartCount); // Aggiorna il badge quando il carrello cambia
+      window.Snipcart.store.subscribe(updateCartCount);
     });
 
     // Disabilita i pulsanti del carrello all'inizio
@@ -225,20 +243,17 @@ const headerMenu = data?.story?.content?.header_menu;
     // Gestione hover e click per cambiare SVG di Milfoski nel mobile menu
     navLinks.forEach((link, index) => {
       link.addEventListener('click', (event) => {
-        event.preventDefault();  // Blocca il comportamento predefinito del link
+        event.preventDefault();
 
-        // Cambia SVG
         svgContainer.src = svgUrls[index + 1];
 
-        // Timeout di fallback
         const fallbackTimeout = setTimeout(() => {
-          window.location.href = link.href;  // Redirect se il caricamento è troppo lento
+          window.location.href = link.href;
         }, 250);
 
-        // Aspetta che l'SVG si carichi
         svgContainer.onload = function () {
           clearTimeout(fallbackTimeout);
-          window.location.href = link.href;  // Esegui il redirect dopo il caricamento
+          window.location.href = link.href;
         };
       });
     });

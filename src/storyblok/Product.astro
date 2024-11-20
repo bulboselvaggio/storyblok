@@ -148,38 +148,102 @@ function extractDimensionsFromURL(url) {
 
   lightbox.init();
 
-  // Gestione della selezione della taglia e attivazione del pulsante Add to Cart
-const sizeInputs = document.querySelectorAll('.size-input') as NodeListOf<HTMLInputElement>;
-const addButton = document.querySelector('.snipcart-add-item') as HTMLButtonElement;
+  document.addEventListener('DOMContentLoaded', function () {
+    const sizeInputs = document.querySelectorAll('.size-input') as NodeListOf<HTMLInputElement>;
+    const addButton = document.querySelector('.snipcart-add-item') as HTMLButtonElement;
 
-if (sizeInputs.length > 0 && addButton) {
-  sizeInputs.forEach(input => {
-    input.addEventListener('change', () => {
-      const selectedSize = document.querySelector('.size-input:checked') as HTMLInputElement;
-      if (selectedSize) {
-        const selectedSizeValue = selectedSize.dataset.size;
-        addButton.disabled = false;
-        addButton.setAttribute('data-item-custom1-value', selectedSizeValue || '');
+    let snipcartReady = false; // Flag per indicare se Snipcart è pronto
+    let snipcartCSSLoaded = false; // Flag per verificare se il CSS è stato caricato
 
-        addButton.style.backgroundColor = '';
-        addButton.style.color = '';
+    // Funzione per caricare il CSS di Snipcart
+    function loadSnipcartCSS(callback) {
+      if (!snipcartCSSLoaded && !document.getElementById("snipcart-css")) {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "https://cdn.snipcart.com/themes/v3.2.1/default/snipcart.css";
+        link.id = "snipcart-css";
+        document.head.appendChild(link);
 
-        const selectedSizeButton = document.querySelector(`.size-button[data-size="${selectedSizeValue}"]`) as HTMLDivElement;
-        if (selectedSizeButton) {
-          const backgroundColor = getComputedStyle(selectedSizeButton).backgroundColor;
-          const color = getComputedStyle(selectedSizeButton).color;
-          addButton.style.backgroundColor = backgroundColor;
-          addButton.style.color = color;
-        }
-      } else {
-        addButton.disabled = true;
-        addButton.style.backgroundColor = '#ccc';
-        addButton.style.color = '#666';
+        link.onload = () => {
+          snipcartCSSLoaded = true; // Imposta il flag per evitare duplicati
+          if (callback) callback(); // Esegui il callback quando il CSS è caricato
+        };
+      } else if (snipcartCSSLoaded && callback) {
+        callback(); // Se già caricato, esegui subito il callback
       }
+    }
+
+    // Disabilita il pulsante all'inizio
+    function disableAddButton() {
+      if (addButton) {
+        addButton.disabled = true;
+        addButton.classList.add('disabled');
+      }
+    }
+
+    // Abilita il pulsante quando Snipcart è pronto e una taglia è selezionata
+    function enableAddButton() {
+      const selectedSize = document.querySelector('.size-input:checked') as HTMLInputElement;
+
+      if (snipcartReady && selectedSize && addButton) {
+        const selectedSizeValue = selectedSize.dataset.size;
+        addButton.setAttribute('data-item-custom1-value', selectedSizeValue || '');
+        addButton.disabled = false;
+        addButton.classList.remove('disabled');
+      }
+    }
+
+    // Aggiungi listener per le modifiche alla selezione della taglia
+    if (sizeInputs.length > 0) {
+      sizeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+          if (snipcartReady) {
+            enableAddButton();
+          } else {
+            disableAddButton(); // Rimane disabilitato se Snipcart non è pronto
+          }
+        });
+      });
+    }
+
+    // Gestisce il click sul pulsante "Add to Cart"
+    if (addButton) {
+      addButton.addEventListener('click', () => {
+        loadSnipcartCSS(() => {
+          // Mostra il carrello dopo che il CSS è stato caricato
+          if (!snipcartReady && typeof window.Snipcart === 'undefined') {
+            window.LoadSnipcart?.(); // Inizializza Snipcart se necessario
+          }
+
+          if (window.Snipcart?.api?.modal) {
+            window.Snipcart.api.modal.show();
+          } else {
+            document.addEventListener(
+              'snipcart.ready',
+              () => {
+                window.Snipcart.api.modal.show();
+              },
+              { once: true } // Assicura che venga eseguito una sola volta
+            );
+          }
+        });
+      });
+    }
+
+    // Abilita il pulsante quando Snipcart è pronto
+    document.addEventListener('snipcart.ready', () => {
+      snipcartReady = true; // Imposta lo stato di Snipcart come pronto
+      enableAddButton();
     });
+
+    // Disabilita il pulsante all'inizio
+    disableAddButton();
   });
-}
 </script>
+
+
+
+
 
 <style>
 /* Contenitore principale per la pagina del prodotto */
@@ -279,10 +343,15 @@ if (sizeInputs.length > 0 && addButton) {
 .snipcart-add-item {
   cursor: pointer;
   margin-top: 10px;
+  background-color: #50b0ae; /* Colore attivo predefinito */
+  color: white; /* Testo attivo */
 }
 
+.snipcart-add-item.disabled, 
 .snipcart-add-item:disabled {
-  background-color: #ccc;
+  background-color: #ccc; /* Sfondo disabilitato */
+  color: #666; /* Testo disabilitato */
   cursor: not-allowed;
 }
+
 </style>

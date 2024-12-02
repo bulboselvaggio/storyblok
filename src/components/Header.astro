@@ -41,9 +41,9 @@ const headerMenu = data?.story?.content?.header_menu;
         {
           headerMenu.map((menu) => (
             <li>
-              <a href={`/${menu.link.cached_url}`} class="text-black hover:text-[#50b0ae]">
-                {menu.link.story.name}
-              </a>
+            <a href={`/${menu.link.cached_url.endsWith('/') ? menu.link.cached_url : `${menu.link.cached_url}/`}`} class="text-black hover:text-[#50b0ae]">
+              {menu.link.story.name}
+            </a>
             </li>
           ))
         }
@@ -69,17 +69,21 @@ const headerMenu = data?.story?.content?.header_menu;
      width="212" 
      height="259">
 
-        <ul class="space-y-4 text-lg font-bold text-center">
-          {
-            headerMenu.map((menu) => (
-              <li>
-                <a href={`/${menu.link.cached_url}`} class="hover:text-[#50b0ae]">
-                  {menu.link.story.name}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+     <ul class="space-y-4 text-lg font-bold text-center">
+      {
+        headerMenu.map((menu) => (
+          <li>
+            <a 
+              href={`/${menu.link.cached_url.endsWith('/') ? menu.link.cached_url : `${menu.link.cached_url}/`}`} 
+              class="hover:text-[#50b0ae]"
+            >
+              {menu.link.story.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    
       </div>
     </div>
   </div>

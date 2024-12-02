@@ -29,7 +29,9 @@ const recentImage = recentArticle?.content?.image?.filename || blok.background_i
 const fallbackImage = "https://a.storyblok.com/f/297215/2000x2000/679cbad1d5/anitatshirtfinished.jpg";
 
 // Link dell'articolo recente o fallback a /blog
-const articleLink = recentArticle?.full_slug ? `/${recentArticle.full_slug}` : '/blog';
+const articleLink = recentArticle?.full_slug
+  ? `/${recentArticle.full_slug.endsWith('/') ? recentArticle.full_slug : `${recentArticle.full_slug}/`}`
+  : '/blog/';
 
 // Testo alternativo dinamico: usa l'alt dell'immagine di Storyblok se presente, altrimenti costruisci il fallback con il titolo della storia
 const altText = recentArticle?.content?.image?.alt || blok.background_image?.alt || `Detail of ${recentArticle?.content?.title || blok.headline}`;

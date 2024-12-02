@@ -10,6 +10,7 @@ const env = loadEnv('', process.cwd(), 'STORYBLOK')
 // https://astro.build/config
 export default defineConfig({
   site: 'https://milfoski.com',
+  trailingSlash: 'always',
   integrations: [
     storyblok({
       accessToken: 'Z25UexdLwCf2QLAZGrP7rwtt',

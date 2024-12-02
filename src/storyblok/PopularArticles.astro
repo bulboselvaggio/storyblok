@@ -14,7 +14,7 @@ let articles = blok.articles
     {
       articles?.length &&
         articles.map((article) => {
-          article.content.slug = article.slug
+          article.content.slug = article.slug.endsWith('/') ? article.slug : `${article.slug}/`;
           return (
             <li>
               <ArticleCard article={article.content} />

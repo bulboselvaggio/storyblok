@@ -90,10 +90,11 @@ const { previousItem, nextItem } = Astro.props;
 
 
 <div class={`navigation ${!previousItem && nextItem ? 'single-next' : ''} ${previousItem && !nextItem ? 'single-prev' : ''}`}>
+
   <!-- Articolo precedente -->
   {previousItem && (
     <div class="navigation-left">
-      <a href={previousItem.url} class="navigation-link">
+      <a href={`${previousItem.url.endsWith('/') ? previousItem.url : `${previousItem.url}/`}`} class="navigation-link">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="icon">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
@@ -108,7 +109,7 @@ const { previousItem, nextItem } = Astro.props;
   <!-- Articolo successivo -->
   {nextItem && (
     <div class="navigation-right">
-      <a href={nextItem.url} class="navigation-link">
+      <a href={`${nextItem.url.endsWith('/') ? nextItem.url : `${nextItem.url}/`}`} class="navigation-link">
         <div class="flex flex-col">
           <span class="navigation-label">Next</span>
           <span class="navigation-title">{nextItem.name}</span>
@@ -119,4 +120,5 @@ const { previousItem, nextItem } = Astro.props;
       </a>
     </div>
   )}
+
 </div>

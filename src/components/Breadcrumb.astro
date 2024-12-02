@@ -3,9 +3,9 @@ const { bookTitle, currentFullSlug } = Astro.props;
 ---
 
 <nav class="breadcrumb">
-  <a href="/books">Books</a>
+  <a href="/books/">Books</a>
   <span class="breadcrumb-separator"></span>
-  <a href={`/books/${currentFullSlug.split('/')[1]}`}>{bookTitle || 'Book Title Not Found'}</a>
+  <a href={`/books/${currentFullSlug.split('/')[1]}/`}>{bookTitle || 'Book Title Not Found'}</a>
 </nav>
 
 <style>

@@ -14,7 +14,7 @@ let products = blok.products || []
       products.length > 0 ? (
         products.map((product) => {
           // Assicurati che il campo `slug` sia presente
-          product.content.slug = product.slug
+          product.content.slug = product.slug.endsWith('/') ? product.slug : `${product.slug}/`;
           return (
             <li key={product.content.slug}> {/* Usa il `slug` come chiave unica */}
               <ProductCard product={product.content} />

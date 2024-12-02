@@ -30,7 +30,7 @@ const sortedBooks = sortBooksByDate(data.stories)
     {
       sortedBooks?.length &&
         sortedBooks.map((book) => {
-          book.content.slug = book.slug // Assegna lo slug al contenuto del libro
+          book.content.slug = book.slug.endsWith('/') ? book.slug : `${book.slug}/`;
           return (
             <li>
               <ArticleCard article={book.content} />

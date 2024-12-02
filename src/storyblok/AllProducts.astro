@@ -23,7 +23,7 @@ const products = data.stories
     {
       products?.length &&
         products.map((product) => {
-          product.content.slug = product.slug
+          product.content.slug = product.slug.endsWith('/') ? product.slug : `${product.slug}/`;
           return (
             <li>
               <ProductCard product={product.content} />

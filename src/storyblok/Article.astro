@@ -210,7 +210,7 @@ const sortedImages = Array.isArray(blok.images) && blok.images.length > 0
   <!-- Pulsante per iniziare a leggere il libro -->
   {blok.category === 'book' && firstPageSlug && (
     <div class="cta-container">
-      <Button href={`/${firstPageSlug}`} label="Start reading" extraClasses="cta-button" />
+      <Button href={`/${firstPageSlug.endsWith('/') ? firstPageSlug : `${firstPageSlug}/`}`} label="Start reading" extraClasses="cta-button" />
     </div>
   )}
 

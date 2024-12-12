@@ -22,3 +22,4 @@ Disallow: /themes/v
 Disallow: /shop
 Disallow: /books/rokko-e-la-storia-pesa
 Disallow: /blog/lorem-4/
+Disallow: /sei-mio

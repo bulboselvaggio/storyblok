@@ -1,19 +1,10 @@
 User-agent: *
 Disallow: /blog/culinaria
 Disallow: /blog/trump-vs-biden
-Disallow: /products$
-Allow: /products/
 Disallow: /products/anita-xxx
 Disallow: /blog/lorem-1
 Disallow: /config
-Disallow: /config/
-Disallow: /blog$
-Allow: /blog/
 Disallow: /books/un-al-giorno
-Disallow: /about$
-Allow: /about/
-Disallow: /books$
-Allow: /books/
 Disallow: /blog/lorem-4
 Disallow: /books/diaboleo
 Disallow: /books/rocco-e-la-storia-pesa
@@ -25,7 +16,6 @@ Disallow: /blog/lorem-3
 Disallow: /blog/lorem-3/
 Disallow: /themes/v
 Disallow: /shop
-Disallow: /shop/
 Disallow: /books/rokko-e-la-storia-pesa
 Disallow: /blog/lorem-4/
 Disallow: /sei-mio/

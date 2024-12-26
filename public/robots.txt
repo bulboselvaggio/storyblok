@@ -10,7 +10,8 @@ Disallow: /config/
 Disallow: /blog$
 Allow: /blog/
 Disallow: /books/un-al-giorno
-Disallow: /about
+Disallow: /about$
+Allow: /about/
 Disallow: /books$
 Allow: /books/
 Disallow: /blog/lorem-4

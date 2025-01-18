@@ -8,3 +8,13 @@
   from = "/blog/sei-mio/"
   to = "/blog/non-si-puo-dire/"
   status = 301
+
+[[redirects]]
+  from = "/blog/lorem-4/"
+  to = "/404/"
+  status = 410
+
+[[redirects]]
+  from = "/blog/lorem-1/"
+  to = "/404/"
+  status = 410

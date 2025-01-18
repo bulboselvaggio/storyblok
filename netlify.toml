@@ -11,15 +11,20 @@
 
 [[redirects]]
   from = "/blog/lorem-4/"
-  to = "/"
+  to = "/404/"
   status = 410
 
 [[redirects]]
   from = "/blog/lorem-1/"
-  to = "/"
+  to = "/404/"
   status = 410
 
 [[redirects]]
   from = "/blog/lorem-2/"
-  to = "/"
+  to = "/404/"
   status = 410
+
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404

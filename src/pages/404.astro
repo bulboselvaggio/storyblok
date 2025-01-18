@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Teaser from '../components/storyblok/Teaser.astro';
+
+const teaserProps = {
+  headline: '404 - Pagina non trovata',
+};
+---
+
+<BaseLayout pageTitle="404 - Pagina non trovata">
+  <Teaser blok={teaserProps} />
+  <section class="text-center py-8">
+    <p class="text-lg text-gray-600">
+      La pagina che stai cercando non esiste o è stata rimossa.
+    </p>
+    <a href="/" class="inline-block mt-4 px-6 py-3 text-white bg-[#50b0ae] rounded shadow">
+      Torna alla Home
+    </a>
+  </section>
+</BaseLayout>

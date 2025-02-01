@@ -3,7 +3,7 @@
     "milfoski": "04554c52e5548cdfc6e49ac6ec5599a64376019f36a71a54ccba590eb9bdd30a"    
   },
   "relays": {
-    "YOUR_HEX_PUBKEY": [
+    "04554c52e5548cdfc6e49ac6ec5599a64376019f36a71a54ccba590eb9bdd30a": [
       "wss://nostr.eden.land",
       "wss://nostr.relay.damus.io",
       "wss://relay.snort.social",

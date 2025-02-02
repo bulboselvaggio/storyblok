@@ -69,7 +69,6 @@ function extractDimensionsFromURL(url) {
         </a>
         {blok.thumbnails?.map((thumbnail, index) => (
           <a 
-            key={index}
             href={thumbnail.filename} 
             data-pswp-width={extractDimensionsFromURL(thumbnail.filename).width} 
             data-pswp-height={extractDimensionsFromURL(thumbnail.filename).height}
@@ -99,7 +98,7 @@ function extractDimensionsFromURL(url) {
       <!-- Selezione della taglia -->
       <div class="size-selection flex flex-wrap gap-2">
         {blok.sizes?.map(size => (
-          <div key={size}>
+          <div>
             <input
               type="radio"
               id={`size-${size}`}
@@ -113,6 +112,7 @@ function extractDimensionsFromURL(url) {
             </label>
           </div>
         ))}
+        
       </div>
 
       <!-- Pulsante Add to Cart -->
